@@ -1,0 +1,32 @@
+version: '3.9'
+name: tp1
+
+services:
+
+  client:
+    container_name: client
+    image: client:latest
+    entrypoint: python3 /main.py
+    environment:
+      - CLI_ID=1
+      - CLI_LOG_LEVEL=DEBUG
+    networks:
+      - testing_net
+    volumes:  
+      - type: bind
+        source: ./data/archive
+        target: /data
+        read_only: true
+    depends_on:
+      - server
+
+volumes:
+  client-config:
+    external: false
+
+networks:
+  testing_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.25.125.0/24
