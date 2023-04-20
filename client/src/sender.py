@@ -12,4 +12,4 @@ class Sender:
     def send_data(self, queue):
         for _i in list(range(3)):
             data = queue.get()
-            logging.debug(f"{data}")
+            logging.debug(f"{data[0].date} and {data[1].date}")
