@@ -1,4 +1,5 @@
 import logging
+import struct
 
 ONE_BYTE = 1
 TWO_BYTES = 2
@@ -16,6 +17,10 @@ class Packet:
     def add_n_byte_number(self, n, number):
         BEnumber = number.to_bytes(n, byteorder='big')
         self.concatenate_bytes(BEnumber)
+
+    def add_float(self, float):
+        float_bytes = struct.pack('f', float)
+        self.__concatenate_bytes(float_bytes)
 
     def add_string_and_length(self, string):
         str_bytes = string.strip('"').encode('utf-8')

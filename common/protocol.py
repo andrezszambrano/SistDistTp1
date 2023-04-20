@@ -2,13 +2,8 @@ import datetime
 
 
 class Protocol:
-    OK_CHAR = 'O'
-    FINISHED_CHAR = 'Z'
-    BATCH_SENT = 'D'
-    START_BATCH = 'S'
-    BET_CHAR = 'B'
-    CONSULT_WINNERS = 'W'
-    FORBIDDEN = 'F'
+    NO_FLOAT = 'N'
+    FLOAT = 'F'
     FOUR_BYTES = 4
     TWO_BYTES = 2
     ONE_BYTE = 1
