@@ -2,6 +2,7 @@ import csv
 import logging
 from datetime import datetime
 
+from .sender import FINISHED, DATE
 from .weather import Weather
 
 FILEPATH = "data/"
@@ -16,9 +17,10 @@ class CityDataReader:
         while True:
             try:
                 chunk = next(weather_chunk_generator)
-                queue.put(chunk)
+                queue.put((DATE,chunk))
             except StopIteration:
                 break
+        queue.put(FINISHED)
 
     def get_weather(self, chunk_size):
         with open(f"{FILEPATH}{self._city_name}/weather.csv", 'r') as file:

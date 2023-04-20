@@ -1,3 +1,4 @@
+import logging
 import signal
 from multiprocessing import Process, SimpleQueue
 
@@ -23,5 +24,10 @@ class Client:
         city_readers_processes = []
         for city in cities:
             city_reader = CityDataReader(city)
-            city_readers_processes.append(Process(target=city_reader.run, args=(queue,), daemon=True).start())
+            city_reader_process = Process(target=city_reader.run, args=(queue,), daemon=True)
+            city_reader_process.start()
+            city_readers_processes.append(city_reader_process)
         self._sender.send_data(queue)
+        for city_readers_process in city_readers_processes:
+            city_readers_process.join()
+        logging.debug(f"finished, all processes joined")
