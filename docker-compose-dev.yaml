@@ -17,8 +17,10 @@ services:
         source: ./data/archive
         target: /data
         read_only: true
-    depends_on:
-      - server
+      - type: bind
+        source: ./client/config.ini
+        target: /config/config.ini
+        read_only: true
 
 volumes:
   client-config:

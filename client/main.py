@@ -3,13 +3,10 @@ import datetime
 import sys
 from configparser import ConfigParser
 
-from common.bets_file import BetsFile
-from common.client import Client
-from common.bet import Bet
+from src.client import Client
 import logging
 import os
 
-BETS_FILEPATH = "data/bets.csv"
 
 def convert_time_to_seconds(time_str):
     time_str = time_str.strip('"')
@@ -35,7 +32,6 @@ def initialize_config():
 
     config_params = {}
     try:
-        config_params["id"] = int(os.getenv('ID', config["DEFAULT"]["CLI_ID"]))
         config_params["server_address"] = os.getenv('SERVER_ADDRESS', config["DEFAULT"]["SERVER_ADDRESS"])
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
     except KeyError as e:
@@ -47,18 +43,17 @@ def initialize_config():
 
 def main():
     config_params = initialize_config()
-    id = config_params["id"]
     logging_level = config_params["logging_level"]
     server_address = config_params["server_address"]
     initialize_log(logging_level)
 
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
-    logging.debug(f"action: config | result: success | client_id: {id} | "
+    logging.debug(f"action: config | result: success | "
                   f"server_address: {server_address} | log_level: {logging_level}")
 
     # Initialize client
-    client = Client(id, server_address)
+    client = Client(server_address)
     client.run()
     sys.exit(0)
 

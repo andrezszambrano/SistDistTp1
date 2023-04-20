@@ -7,7 +7,7 @@ class Sender:
     def __init__(self, server_address):
         host, _port = server_address.split(':')
         port = int(_port)
-        self._socket = Socket(host, port)
+        #self._socket = Socket(host, port)
 
     def send_data(self, queue):
         for _i in list(range(3)):

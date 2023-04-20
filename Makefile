@@ -16,9 +16,9 @@ build: deps
 .PHONY: build
 
 docker-image:
-	docker build -f ./server/Dockerfile -t "server:latest" .
+	#docker build -f ./server/Dockerfile -t "server:latest" .
 	docker build -f ./client/Dockerfile -t "client:latest" .
-	docker build -f ./tests/Dockerfile -t "server-test:latest" .
+	#docker build -f ./tests/Dockerfile -t "server-test:latest" .
 
 	# Execute this command from time to time to clean up intermediate stages generated 
 	# during client build (your hard drive will like this :) ). Don't left uncommented if you 
