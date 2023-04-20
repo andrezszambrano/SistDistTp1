@@ -2,7 +2,8 @@ import logging
 
 from .socket_wrapper import Socket
 
-DATE = "D"
+WEATHER_DATA = "W"
+STATION_DATA = "S"
 FINISHED = "F"
 
 class Sender:
@@ -19,5 +20,7 @@ class Sender:
             if data[0] == FINISHED:
                 counter = counter + 1
                 keep_receiving = not (counter == 3)
+            elif data[0] == WEATHER_DATA:
+                logging.debug(f"{data[1]}{data[2][0].date} and {data[2][1].date}")
             else:
-                logging.debug(f"{data[1][0].date} and {data[1][1].date}")
+                logging.debug(f"{data[1]}{data[2][0].name} and {data[2][1].name}")

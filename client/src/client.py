@@ -23,8 +23,8 @@ class Client:
         cities = [MONTREAL, WASHINGTON, TORONTO]
         city_readers_processes = []
         for city in cities:
-            city_reader = CityDataReader(city)
-            city_reader_process = Process(target=city_reader.run, args=(queue,), daemon=True)
+            city_reader = CityDataReader(city, queue)
+            city_reader_process = Process(target=city_reader.run, args=(), daemon=True)
             city_reader_process.start()
             city_readers_processes.append(city_reader_process)
         self._sender.send_data(queue)
