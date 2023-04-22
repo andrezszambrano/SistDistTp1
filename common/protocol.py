@@ -48,12 +48,12 @@ class Protocol:
         return datetime.date.fromisoformat(date_str)
 
     def _recv_float_else_none(self, socket):
-        type = self._recv_byte(socket)
-        if type == self.NO_FLOAT:
+        aux = self._recv_byte(socket)
+        if aux == self.NO_FLOAT:
             return None
         else:
             float_bytes = socket.recv(self.FOUR_BYTES)
-            return struct.unpack('f', float_bytes)
+            return struct.unpack('f', float_bytes)[0]
 
     def _add_float_else_none(self, packet, float_number):
         if float_number is None:

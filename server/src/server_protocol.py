@@ -13,12 +13,12 @@ class ServerProtocol(Protocol):
         super(ServerProtocol, self).__init__()
 
     def recv_action(self, socket):
-        type = super()._recv_byte(socket)
-        if type == super().FINISHED:
+        message_type = super()._recv_byte(socket)
+        if message_type == super().FINISHED:
             logging.debug("FINISHED RECEIVED")
             return FinishedAction()
         city = super()._recv_byte(socket)
-        if type == super().WEATHER_DATA:
+        if message_type == super().WEATHER_DATA:
             weather_data = self.__recv_weather_data(socket)
             return DataAction(self.WEATHER_DATA, city, weather_data)
         else:
@@ -49,11 +49,13 @@ class ServerProtocol(Protocol):
         return Weather(date, prectot, qv2m, rh2m, ps, t2m_range, ts, t2mdew, t2mwet, t2m_max, t2m_min, t2m, ws50m_range,
                  ws10m_range, ws50m_min, ws10m_min, ws50m_max, ws10m_max, ws50m, ws10m)
 
-
     def __recv_station_data(self, socket):
         code = super()._recv_n_byte_number(socket, super().TWO_BYTES)
         name = super()._recv_string(socket)
         latitude = super()._recv_float_else_none(socket)
         longitude = super()._recv_float_else_none(socket)
         yearid = super()._recv_n_byte_number(socket, super().TWO_BYTES)
-        return Station(code, name, latitude, longitude, yearid)
+        return Station(code, name,
+                       latitude, longitude,
+                    #2, 4,
+                       yearid)
