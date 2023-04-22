@@ -15,7 +15,6 @@ class ServerProtocol(Protocol):
     def recv_action(self, socket):
         message_type = super()._recv_byte(socket)
         if message_type == super().FINISHED:
-            logging.debug("FINISHED RECEIVED")
             return FinishedAction()
         city = super()._recv_byte(socket)
         if message_type == super().WEATHER_DATA:
@@ -55,7 +54,4 @@ class ServerProtocol(Protocol):
         latitude = super()._recv_float_else_none(socket)
         longitude = super()._recv_float_else_none(socket)
         yearid = super()._recv_n_byte_number(socket, super().TWO_BYTES)
-        return Station(code, name,
-                       latitude, longitude,
-                    #2, 4,
-                       yearid)
+        return Station(code, name, latitude, longitude, yearid)
