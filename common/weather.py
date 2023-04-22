@@ -1,3 +1,5 @@
+import logging
+
 
 class Weather:
     def __init__(self, date, prectot, qv2m, rh2m, ps, t2m_range, ts, t2mdew, t2mwet, t2m_max, t2m_min, t2m, ws50m_range,
@@ -22,3 +24,6 @@ class Weather:
         self.ws10m_max = ws10m_max
         self.ws50m = ws50m
         self.ws10m = ws10m
+
+    def info(self):
+        return f"WEATHER: {self.date}, {self.prectot}"

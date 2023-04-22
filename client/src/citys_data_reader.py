@@ -7,18 +7,23 @@ from .station import Station
 from .weather import Weather
 
 DATA_PATH = "data/"
-FIVE_MB = 5 * 1024 * 1024 # 5 MB
+FIVE_MB = 5 * 1024 * 1024  # 5 MB
 WEATHER = "weather.csv"
 STATIONS = "stations.csv"
 
+
 def row_to_weather_obj(row):
     return Weather(datetime.strptime(row[0], '%Y-%m-%d').date(), float(row[1]), float(row[2]), float(row[3]),
-                              float(row[4]), float(row[5]), float(row[6]), float(row[7]), float(row[8]), float(row[9]),
-                              float(row[10]), float(row[11]), float(row[12]), float(row[13]), float(row[14]),
-                              float(row[15]), float(row[16]), float(row[17]), float(row[18]), float(row[19]))
+                   float(row[4]), float(row[5]), float(row[6]), float(row[7]), float(row[8]), float(row[9]),
+                   float(row[10]), float(row[11]), float(row[12]), float(row[13]), float(row[14]),
+                   float(row[15]), float(row[16]), float(row[17]), float(row[18]), float(row[19]))
+
 
 def row_to_station_obj(row):
-    return Station(row[0], row[1], row[2], row[3], row[4])
+    latitude = None if row[2] == '' else float(row[2])
+    longitude = None if row[3] == '' else float(row[3])
+    return Station(int(row[0]), row[1], latitude, longitude, int(row[4]))
+
 
 class CityDataReader:
     def __init__(self, city_name, queue):
@@ -26,7 +31,8 @@ class CityDataReader:
         self._queue = queue
 
     def run(self):
-        weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", FIVE_MB, row_to_weather_obj)
+        weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", FIVE_MB,
+                                                  row_to_weather_obj)
         self.__send_chunks(weather_chunk_generator, WEATHER_DATA)
         stations_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{STATIONS}", FIVE_MB,
                                                    row_to_station_obj)

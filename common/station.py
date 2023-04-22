@@ -1,3 +1,4 @@
+import logging
 
 
 class Station:
@@ -7,3 +8,6 @@ class Station:
         self.latitude = latitude
         self.longitude = longitude
         self.yearid = yearid
+
+    def info(self):
+        return f"STATION: {self.code}, {self.name}, {self.latitude}, {self.longitude}, {self.yearid}"

@@ -3,6 +3,21 @@ name: tp1
 
 services:
 
+  server:
+    container_name: server
+    image: server:latest
+    entrypoint: python3 /main.py
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOGGING_LEVEL=DEBUG
+    networks:
+      - testing_net
+    volumes:
+      - type: bind
+        source: ./server/config.ini
+        target: /config/config.ini
+        read_only: true
+
   client:
     container_name: client
     image: client:latest
@@ -21,9 +36,15 @@ services:
         source: ./client/config.ini
         target: /config/config.ini
         read_only: true
+    depends_on:
+      - server
 
 volumes:
+  server-config:
+    external: false
   client-config:
+    external: false
+  dataset:
     external: false
 
 networks:

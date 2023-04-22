@@ -1,9 +1,13 @@
 import datetime
+import struct
 
 
 class Protocol:
     NO_FLOAT = 'N'
     FLOAT = 'F'
+    WEATHER_DATA = 'W'
+    STATION_DATA = 'S'
+    FINISHED = 'F'
     FOUR_BYTES = 4
     TWO_BYTES = 2
     ONE_BYTE = 1
@@ -42,3 +46,18 @@ class Protocol:
         date_len = self._recv_n_byte_number(socket, self.ONE_BYTE)
         date_str = socket.recv(date_len).decode('utf-8')
         return datetime.date.fromisoformat(date_str)
+
+    def _recv_float_else_none(self, socket):
+        type = self._recv_byte(socket)
+        if type == self.NO_FLOAT:
+            return None
+        else:
+            float_bytes = socket.recv(self.FOUR_BYTES)
+            return struct.unpack('f', float_bytes)
+
+    def _add_float_else_none(self, packet, float_number):
+        if float_number is None:
+            packet.add_byte(self.NO_FLOAT)
+        else:
+            packet.add_byte(self.FLOAT)
+            packet.add_float(float_number)

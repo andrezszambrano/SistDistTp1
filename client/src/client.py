@@ -3,11 +3,8 @@ import signal
 from multiprocessing import Process, SimpleQueue
 
 from .citys_data_reader import CityDataReader
+from .client_protocol import MONTREAL, WASHINGTON, TORONTO
 from .sender import Sender
-
-MONTREAL = "montreal"
-WASHINGTON = "washington"
-TORONTO = "toronto"
 
 class Client:
     def __init__(self, server_address):
