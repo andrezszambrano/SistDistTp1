@@ -18,7 +18,7 @@ class Socket:
         self._socket.shutdown(socket.SHUT_RDWR)
         self._socket.close()
 
-    def send(self, buffer, length):
+    def __send(self, buffer, length):
         sent = 0
         while sent < length:
             aux = self._socket.send(buffer[sent:])
@@ -30,3 +30,8 @@ class Socket:
             data_chunk = self._socket.recv(length - len(received_data))
             received_data = received_data + data_chunk
         return received_data
+
+
+    def send(self, packet):
+        bytes = packet.get_bytes()
+        self.__send(bytes, len(bytes))

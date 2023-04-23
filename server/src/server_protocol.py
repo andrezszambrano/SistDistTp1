@@ -21,7 +21,7 @@ class ServerProtocol(Protocol):
         elif message_type == super().ASK_ACK:
             packet = Packet()
             packet.add_byte(super().ACK)
-            packet.send_to_socket(socket)
+            socket.send(packet)
             return NoAction()
         city = super()._recv_byte(socket)
         if message_type == super().WEATHER_DATA:
