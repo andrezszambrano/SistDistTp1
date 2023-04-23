@@ -2,9 +2,11 @@ import logging
 
 from .data_action import DataAction
 from .finished_action import FinishedAction
+from .no_action import NoAction
 from .protocol import Protocol
 from .weather import Weather
 from .station import Station
+from .packet import Packet
 
 
 class ServerProtocol(Protocol):
@@ -16,6 +18,11 @@ class ServerProtocol(Protocol):
         message_type = super()._recv_byte(socket)
         if message_type == super().FINISHED:
             return FinishedAction()
+        elif message_type == super().ASK_ACK:
+            packet = Packet()
+            packet.add_byte(super().ACK)
+            packet.send_to_socket(socket)
+            return NoAction()
         city = super()._recv_byte(socket)
         if message_type == super().WEATHER_DATA:
             weather_data = self.__recv_weather_data(socket)
@@ -23,6 +30,7 @@ class ServerProtocol(Protocol):
         else:
             station_data = self.__recv_station_data(socket)
             return DataAction(self.STATION_DATA, city, station_data)
+
 
     def __recv_weather_data(self, socket):
         date = super()._recv_date(socket)

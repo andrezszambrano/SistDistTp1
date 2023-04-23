@@ -1,10 +1,11 @@
-import logging
 import struct
 
 ONE_BYTE = 1
 TWO_BYTES = 2
 
 class Packet:
+    MAX_CHUNK_SIZE = 8 * 1024  # 8KB
+
     def __init__(self):
         self._bytes = b""
 
@@ -33,4 +34,8 @@ class Packet:
         self.__concatenate_bytes(date_bytes)
 
     def send_to_socket(self, socket):
-        socket.send(self._bytes, len(self._bytes))
+        offset = 0
+        while offset < len(self._bytes):
+            chunk = self._bytes[offset:offset + self.MAX_CHUNK_SIZE]
+            socket.send(chunk, len(chunk))
+            offset += len(chunk)

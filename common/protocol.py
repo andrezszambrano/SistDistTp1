@@ -8,6 +8,8 @@ class Protocol:
     WEATHER_DATA = 'W'
     STATION_DATA = 'S'
     FINISHED = 'F'
+    ASK_ACK = 'A'
+    ACK = 'O'
     FOUR_BYTES = 4
     TWO_BYTES = 2
     ONE_BYTE = 1

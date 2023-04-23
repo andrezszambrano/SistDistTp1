@@ -14,8 +14,8 @@ class ClientProtocol(Protocol):
         self._city_name_to_char = {MONTREAL: 'M', WASHINGTON: 'W', TORONTO: 'T'}
 
     def send_weather_data(self, socket, city_name, weather_list):
+        packet = Packet()
         for weather in weather_list:
-            packet = Packet()
             packet.add_byte(super().WEATHER_DATA)
             packet.add_byte(self._city_name_to_char[city_name])
             packet.add_date(weather.date)
@@ -38,11 +38,13 @@ class ClientProtocol(Protocol):
             super()._add_float_else_none(packet, weather.ws10m_max)
             super()._add_float_else_none(packet, weather.ws50m)
             super()._add_float_else_none(packet, weather.ws10m)
-            packet.send_to_socket(socket)
+        packet.add_byte(super().ASK_ACK)
+        packet.send_to_socket(socket)
+        super()._recv_byte(socket)
 
     def send_station_data(self, socket, city_name, stations_list):
+        packet = Packet()
         for station in stations_list:
-            packet = Packet()
             packet.add_byte(super().STATION_DATA)
             packet.add_byte(self._city_name_to_char[city_name])
             packet.add_n_byte_number(super().TWO_BYTES, station.code)
@@ -50,7 +52,9 @@ class ClientProtocol(Protocol):
             super()._add_float_else_none(packet, station.latitude)
             super()._add_float_else_none(packet, station.longitude)
             packet.add_n_byte_number(super().TWO_BYTES, station.yearid)
-            packet.send_to_socket(socket)
+        packet.add_byte(super().ASK_ACK)
+        packet.send_to_socket(socket)
+        super()._recv_byte(socket)
 
     def send_finished(self, socket):
         packet = Packet()
