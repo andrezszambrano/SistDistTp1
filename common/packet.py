@@ -12,6 +12,9 @@ class Packet:
     def __concatenate_bytes(self, bytes):
         self._bytes = self._bytes + bytes
 
+    def get_bytes(self):
+        return self._bytes
+
     def add_byte(self, byte):
         self.__concatenate_bytes(byte.encode('utf-8'))
 

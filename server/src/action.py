@@ -4,5 +4,5 @@ class Action:
     def __init__(self):
         pass
 
-    def perform_action(self, finished_bool):
+    def perform_action(self, finished_bool, queue):
         pass

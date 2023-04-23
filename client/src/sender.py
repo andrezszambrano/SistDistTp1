@@ -23,6 +23,7 @@ class Sender:
                 counter = counter + 1
                 keep_receiving = not (counter == 3)
             elif data[0] == WEATHER_DATA:
+                continue
                 protocol.send_weather_data(self._socket, data[1], data[2])
             else:
                 protocol.send_station_data(self._socket, data[1], data[2])
