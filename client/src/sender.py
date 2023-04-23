@@ -26,7 +26,7 @@ class Sender:
                 #pass
                 protocol.send_weather_data(self._socket, data[1], data[2])
             else:
-                pass
-                #protocol.send_station_data(self._socket, data[1], data[2])
+                #pass
+                protocol.send_station_data(self._socket, data[1], data[2])
         protocol.send_finished(self._socket)
         self._socket.shutdown_and_close()
