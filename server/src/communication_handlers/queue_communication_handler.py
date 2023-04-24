@@ -5,8 +5,9 @@ from ..server_protocol import ServerProtocol
 
 
 class QueueCommunicationHandler:
-    def __init__(self, queue):
+    def __init__(self, queue, queue_id=0):
         self._queue = queue
+        self._queue_id = queue_id
 
     def send_finished(self):
         packet = Packet()
@@ -34,15 +35,15 @@ class QueueCommunicationHandler:
 
     def recv_data_distributer_action(self):
         protocol = ServerProtocol()
-        packet = self._queue.get_packet()
+        packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_data_distributer_action(packet)
 
     def recv_weather_data(self):
         protocol = ServerProtocol()
-        packet = self._queue.get_packet()
+        packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_weather_data_or_finished(packet)
 
     def recv_station_data(self):
         protocol = ServerProtocol()
-        packet = self._queue.get_packet()
+        packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_station_data_or_finished(packet)

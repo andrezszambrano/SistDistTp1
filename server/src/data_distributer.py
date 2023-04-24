@@ -5,14 +5,18 @@ from .communication_handlers.queue_communication_handler import QueueCommunicati
 from .duplicated_stations_processor import DuplicatedStationsProcessor
 from .mutable_boolean import MutableBoolean
 from .queues.prod_cons_queue import ProdConsQueue
+from .queues.publ_subs_queue import PublSubsQueue
 from .weather_processor import WeatherProcessor
 
 
 class DataDistributer:
+    AMOUNT_OF_STATIONS_SUBS = 1
+    DUPLICATED_STATIONS_QUEUE_ID = 0
+
     def __init__(self, data_queue):
         self._data_queue = data_queue
         self._weather_queue = ProdConsQueue()
-        self._stations_queue = ProdConsQueue()
+        self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
 
     def run(self):
         finished_bool = MutableBoolean(False)
@@ -34,7 +38,7 @@ class DataDistributer:
         return weather_processor_process
 
     def __create_and_run_duplicated_stations_processor(self):
-        duplicated_stations_processor = DuplicatedStationsProcessor(self._stations_queue)
+        duplicated_stations_processor = DuplicatedStationsProcessor(self._stations_queue, self.DUPLICATED_STATIONS_QUEUE_ID)
         duplicated_stations_processor_process = Process(target=duplicated_stations_processor.run, args=(), daemon=False)
         duplicated_stations_processor_process.start()
         return duplicated_stations_processor_process

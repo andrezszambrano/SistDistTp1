@@ -10,7 +10,7 @@ class ProdConsQueue(PacketSender):
         super(ProdConsQueue, self).__init__()
         self._queue = SimpleQueue()
 
-    def get_packet(self):
+    def get_packet(self, _queue_id):
         return Packet(self._queue.get())
 
     def send(self, packet):
