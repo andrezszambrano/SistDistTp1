@@ -1,11 +1,16 @@
 from multiprocessing import SimpleQueue
 
-class ProdConsQueue:
+from ..packet import Packet
+from ..packet_sender import PacketSender
+
+
+class ProdConsQueue(PacketSender):
     def __init__(self):
+        super(ProdConsQueue, self).__init__()
         self._queue = SimpleQueue()
 
-    def get(self):
-        self._queue.get()
+    def get_packet(self):
+        return Packet(self._queue.get())
 
-    def put(self, data):
-        self._queue.put(data)
+    def send(self, packet):
+        self._queue.put(packet.get_bytes())

@@ -3,7 +3,7 @@ import signal
 from multiprocessing import Process, SimpleQueue
 
 from .citys_data_reader import CityDataReader
-from .client_protocol import MONTREAL, WASHINGTON, TORONTO
+from .protocol import MONTREAL, WASHINGTON, TORONTO
 from .sender import Sender
 
 class Client:

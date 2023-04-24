@@ -19,14 +19,16 @@ class Server:
 
     def run(self):
         socket = self._acceptor_socket.accept()
-        communication_handler = CommunicationHandler(socket)
+        client_communicator_handler = CommunicationHandler(socket)
+        distributor_communicator_handler = CommunicationHandler(queue=self._prod_cons_queue)
         finished_bool = MutableBoolean(False)
         #data_distributer = DataDistributer(self._prod_cons_queue)
         #data_distributer_process = Process(target=data_distributer.run, args=(), daemon=True)
         #data_distributer_process.start()
         while not finished_bool.get_boolean():
-            action = communication_handler.recv_action()
-            action.perform_action(finished_bool, communication_handler)
+            action = client_communicator_handler.recv_action()
+            action.perform_action(finished_bool, client_communicator_handler, distributor_communicator_handler)
+        #data_distributer_process.join()
         socket.shutdown_and_close()
         self._acceptor_socket.shutdown_and_close()
         logging.debug(f"finished")

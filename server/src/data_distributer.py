@@ -8,7 +8,7 @@ class DataDistributer:
 
     def run(self):
         finished_bool = MutableBoolean(False)
-        communication_handler = CommunicationHandler(self._queue)
-        while True:
-            action = communication_handler.recv_data_distributer_action()
+        communication_handler = CommunicationHandler()
+        while not finished_bool.get_boolean():
+            action = communication_handler.recv_data_distributer_action(self._queue)
             action.perform_action(finished_bool)

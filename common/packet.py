@@ -6,8 +6,8 @@ TWO_BYTES = 2
 class Packet:
     MAX_CHUNK_SIZE = 8 * 1024  # 8KB
 
-    def __init__(self):
-        self._bytes = b""
+    def __init__(self, bytes=b""):
+        self._bytes = bytes
 
     def __concatenate_bytes(self, bytes):
         self._bytes = self._bytes + bytes

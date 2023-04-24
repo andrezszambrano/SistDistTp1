@@ -21,7 +21,7 @@ class ServerProtocol(Protocol):
             return FinishedAction()
         elif message_type == super().ASK_ACK:
             return AckAction()
-        city = super()._recv_byte(byte_stream)
+        city = self.__get_city_name(byte_stream)
         if message_type == super().WEATHER_DATA:
             weather_data = self.__recv_weather_data(byte_stream)
             return DataAction(self.WEATHER_DATA, city, weather_data)
@@ -29,8 +29,34 @@ class ServerProtocol(Protocol):
             station_data = self.__recv_station_data(byte_stream)
             return DataAction(self.STATION_DATA, city, station_data)
 
+    def __get_city_name(self, byte_stream):
+        city_char = super()._recv_byte(byte_stream)
+        return list(self._city_name_to_char.keys())[list(self._city_name_to_char.values()).index(city_char)]
+
+    def __add_station_to_packet(self, packet, city_name, station):
+        packet.add_byte(super().STATION_DATA)
+        packet.add_byte(self._city_name_to_char[city_name])
+        packet.add_n_byte_number(super().TWO_BYTES, station.code)
+        packet.add_string_and_length(station.name)
+        super()._add_float_else_none(packet, station.latitude)
+        super()._add_float_else_none(packet, station.longitude)
+        packet.add_n_byte_number(super().TWO_BYTES, station.yearid)
+
+    def add_data_to_packet(self, packet, data_type, city_name, data):
+        if data_type == super().STATION_DATA:
+            self.__add_station_to_packet(packet, city_name, data)
+
     def recv_data_distributer_action(self, byte_stream):
-        pass
+        message_type = super()._recv_byte(byte_stream)
+        if message_type == super().FINISHED:
+            return FinishedAction()
+        city = super()._recv_byte(byte_stream)
+        if message_type == super().WEATHER_DATA:
+            weather_data = self.__recv_weather_data(byte_stream)
+            return DataAction(self.WEATHER_DATA, city, weather_data)
+        else:
+            station_data = self.__recv_station_data(byte_stream)
+            return DataAction(self.STATION_DATA, city, station_data)
 
     def add_ack_to_packet(self, packet):
         packet.add_byte(super().ACK)

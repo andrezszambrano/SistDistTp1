@@ -1,6 +1,9 @@
 import datetime
 import struct
 
+MONTREAL = "montreal"
+WASHINGTON = "washington"
+TORONTO = "toronto"
 
 class Protocol:
     NO_FLOAT = 'N'
@@ -15,7 +18,7 @@ class Protocol:
     ONE_BYTE = 1
 
     def __init__(self):
-        pass
+        self._city_name_to_char = {MONTREAL: 'M', WASHINGTON: 'W', TORONTO: 'T'}
 
     def _recv_byte(self, byte_stream):
         return byte_stream.read(self.ONE_BYTE).decode('utf-8')
@@ -46,3 +49,6 @@ class Protocol:
         else:
             packet.add_byte(self.FLOAT)
             packet.add_float(float_number)
+
+    def add_finished_to_packet(self, packet):
+        packet.add_byte(self.FINISHED)
