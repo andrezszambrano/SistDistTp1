@@ -1,13 +1,17 @@
 import struct
 
+from .byte_stream import ByteStream
+
 ONE_BYTE = 1
 TWO_BYTES = 2
 
-class Packet:
+class Packet(ByteStream):
     MAX_CHUNK_SIZE = 8 * 1024  # 8KB
 
     def __init__(self, bytes=b""):
+        super(Packet).__init__()
         self._bytes = bytes
+        self._read_counter = 0
 
     def __concatenate_bytes(self, bytes):
         self._bytes = self._bytes + bytes
@@ -42,3 +46,8 @@ class Packet:
             chunk = self._bytes[offset:offset + self.MAX_CHUNK_SIZE]
             socket.send(chunk, len(chunk))
             offset += len(chunk)
+
+    def read(self, length):
+        bytes = self._bytes[self._read_counter: self._read_counter + length]
+        self._read_counter = self._read_counter + length
+        return bytes

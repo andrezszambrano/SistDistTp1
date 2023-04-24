@@ -50,7 +50,7 @@ class ServerProtocol(Protocol):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().FINISHED:
             return FinishedAction()
-        city = super()._recv_byte(byte_stream)
+        city = self.__get_city_name(byte_stream)
         if message_type == super().WEATHER_DATA:
             weather_data = self.__recv_weather_data(byte_stream)
             return DataAction(self.WEATHER_DATA, city, weather_data)

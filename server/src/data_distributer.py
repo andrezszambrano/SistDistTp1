@@ -11,4 +11,4 @@ class DataDistributer:
         communication_handler = CommunicationHandler()
         while not finished_bool.get_boolean():
             action = communication_handler.recv_data_distributer_action(self._queue)
-            action.perform_action(finished_bool)
+            action.perform_action_(finished_bool)

@@ -16,7 +16,7 @@ class CommunicationHandler:
     def send_finished(self):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_finished_to_packet()
+        protocol.add_finished_to_packet(packet)
         self._queue.send(packet)
 
     def recv_action(self):

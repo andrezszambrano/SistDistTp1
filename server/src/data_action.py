@@ -12,5 +12,8 @@ class DataAction(Action):
         self._data = data
 
     def perform_action(self, _finished_bool, client_communicator_handler, distributor_communicator_handler):
-        pass
-        #distributor_communicator_handler.send_data_to_distributer(self._data_type, self._city_name, self._data)
+        distributor_communicator_handler.send_data_to_distributer(self._data_type, self._city_name, self._data)
+
+
+    def perform_action_(self, _finished_bool):
+        logging.debug(f"{self._data_type}, {self._city_name}: {self._data.info()}")
