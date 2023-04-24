@@ -1,3 +1,4 @@
+import logging
 
 from .client_communication_handler import ClientCommunicationHandler
 from .socket_wrapper import Socket
@@ -24,6 +25,7 @@ class Sender:
             elif data[0] == WEATHER_DATA:
                 communication_handler.send_weather_data(data[1], data[2])
             else:
+                continue
                 communication_handler.send_station_data(data[1], data[2])
         communication_handler.send_finished()
         self._socket.shutdown_and_close()

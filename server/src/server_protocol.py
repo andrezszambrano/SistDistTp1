@@ -1,3 +1,4 @@
+import logging
 
 from .actions.ack_action import AckAction
 from .actions.data_action import DataAction
@@ -50,6 +51,13 @@ class ServerProtocol(Protocol):
 
     def add_ack_to_packet(self, packet):
         packet.add_byte(super().ACK)
+
+    def recv_weather_data_or_finished(self, byte_stream):
+        message_type = super()._recv_byte(byte_stream)
+        if message_type == super().FINISHED:
+            return None
+        city = self.__get_city_name(byte_stream)
+        return self.__recv_weather_data(byte_stream)
 
     def __recv_weather_data(self, byte_stream):
         date = super()._recv_date(byte_stream)

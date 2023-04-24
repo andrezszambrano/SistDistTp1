@@ -1,3 +1,5 @@
+import logging
+
 from ..packet import Packet
 from ..server_protocol import ServerProtocol
 
@@ -18,7 +20,18 @@ class QueueCommunicationHandler:
         protocol.add_data_to_packet(packet, data_type, city_name, data)
         self._queue.send(packet)
 
+    def send_data_to_weather_process(self, data_type, city_name, data):
+        packet = Packet()
+        protocol = ServerProtocol()
+        protocol.add_data_to_packet(packet, data_type, city_name, data)
+        self._queue.send(packet)
+
     def recv_data_distributer_action(self):
         protocol = ServerProtocol()
         packet = self._queue.get_packet()
         return protocol.recv_data_distributer_action(packet)
+
+    def recv_weather_data(self):
+        protocol = ServerProtocol()
+        packet = self._queue.get_packet()
+        return protocol.recv_weather_data_or_finished(packet)

@@ -1,3 +1,4 @@
+import logging
 from multiprocessing import SimpleQueue
 
 from ..packet import Packet
