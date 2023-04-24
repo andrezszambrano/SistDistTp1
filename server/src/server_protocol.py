@@ -1,5 +1,6 @@
 import logging
 
+from .ack_action import AckAction
 from .data_action import DataAction
 from .finished_action import FinishedAction
 from .no_action import NoAction
@@ -14,23 +15,22 @@ class ServerProtocol(Protocol):
     def __init__(self):
         super(ServerProtocol, self).__init__()
 
-    def recv_action(self, socket):
-        message_type = super()._recv_byte(socket)
+    def recv_action(self, byte_stream):
+        message_type = super()._recv_byte(byte_stream)
         if message_type == super().FINISHED:
             return FinishedAction()
         elif message_type == super().ASK_ACK:
-            packet = Packet()
-            packet.add_byte(super().ACK)
-            socket.send(packet)
-            return NoAction()
-        city = super()._recv_byte(socket)
+            return AckAction()
+        city = super()._recv_byte(byte_stream)
         if message_type == super().WEATHER_DATA:
-            weather_data = self.__recv_weather_data(socket)
+            weather_data = self.__recv_weather_data(byte_stream)
             return DataAction(self.WEATHER_DATA, city, weather_data)
         else:
-            station_data = self.__recv_station_data(socket)
+            station_data = self.__recv_station_data(byte_stream)
             return DataAction(self.STATION_DATA, city, station_data)
 
+    def add_ack_to_packet(self, packet):
+        packet.add_byte(super().ACK)
 
     def __recv_weather_data(self, socket):
         date = super()._recv_date(socket)

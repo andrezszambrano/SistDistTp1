@@ -11,5 +11,5 @@ class DataAction(Action):
         self._city_name = city_name
         self._data = data
 
-    def perform_action(self, _finished_bool):
+    def perform_action(self, _finished_bool, communication_handler):
         pass

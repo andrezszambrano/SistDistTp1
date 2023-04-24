@@ -3,6 +3,7 @@ import logging
 from .acceptor_socket import AcceptorSocket
 from .mutable_boolean import MutableBoolean
 from .server_protocol import ServerProtocol
+from .communication_handler import CommunicationHandler
 
 
 class Server:
@@ -13,12 +14,12 @@ class Server:
         self._client_processes = []
 
     def run(self):
-        protocol = ServerProtocol()
         socket = self._acceptor_socket.accept()
+        communication_handler = CommunicationHandler(socket)
         finished_bool = MutableBoolean(False)
         while not finished_bool.get_boolean():
-            action = protocol.recv_action(socket)
-            action.perform_action(finished_bool)
+            action = communication_handler.recv_action()
+            action.perform_action(finished_bool, communication_handler)
         socket.shutdown_and_close()
         self._acceptor_socket.shutdown_and_close()
         logging.debug(f"finished")
