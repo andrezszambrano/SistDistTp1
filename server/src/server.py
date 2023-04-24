@@ -2,7 +2,6 @@ import logging
 
 from .acceptor_socket import AcceptorSocket
 from .mutable_boolean import MutableBoolean
-from .server_protocol import ServerProtocol
 from .communication_handler import CommunicationHandler
 
 
