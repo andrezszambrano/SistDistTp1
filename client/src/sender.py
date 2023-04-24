@@ -1,5 +1,5 @@
 
-from .communication_handler import CommunicationHandler
+from .client_communication_handler import ClientCommunicationHandler
 from .socket_wrapper import Socket
 
 WEATHER_DATA = "W"
@@ -15,7 +15,7 @@ class Sender:
     def send_data(self, queue):
         counter = 0
         keep_receiving = True
-        communication_handler = CommunicationHandler(self._socket)
+        communication_handler = ClientCommunicationHandler(self._socket)
         while keep_receiving:
             data = queue.get()
             if data[0] == FINISHED:

@@ -2,7 +2,7 @@ from .client_protocol import ClientProtocol
 from .packet import Packet
 
 
-class CommunicationHandler:
+class ClientCommunicationHandler:
     def __init__(self, socket):
         self._socket = socket
 
