@@ -32,7 +32,7 @@ class ServerProtocol(Protocol):
 
     def add_data_to_packet(self, packet, data_type, data):
         if data_type == super().STATION_DATA:
-            self._add_station_to_packet(packet, data)
+            self.add_station_to_packet(packet, data)
         else:
             self.add_weather_to_packet(packet, data)
 
@@ -55,6 +55,12 @@ class ServerProtocol(Protocol):
         if message_type == super().FINISHED:
             return None
         return self.__recv_weather_data(byte_stream)
+
+    def recv_station_data_or_finished(self, byte_stream):
+        message_type = super()._recv_byte(byte_stream)
+        if message_type == super().FINISHED:
+            return None
+        return self.__recv_station_data(byte_stream)
 
     def __recv_weather_data(self, byte_stream):
         city = self.__get_city_name(byte_stream)

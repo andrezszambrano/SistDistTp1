@@ -10,6 +10,7 @@ class FinishedAction(Action):
         finished_bool.set(True)
         distributor_communicator_handler.send_finished()
 
-    def perform_action_(self, finished_bool, weather_communication_handler):
+    def perform_action_(self, finished_bool, weather_communication_handler, duplicated_stations_communication_handler):
         finished_bool.set(True)
         weather_communication_handler.send_finished()
+        duplicated_stations_communication_handler.send_finished()

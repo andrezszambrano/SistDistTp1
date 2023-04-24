@@ -50,7 +50,7 @@ class Protocol:
             packet.add_byte(self.FLOAT)
             packet.add_float(float_number)
 
-    def _add_station_to_packet(self, packet, station):
+    def add_station_to_packet(self, packet, station):
         packet.add_byte(self.STATION_DATA)
         packet.add_byte(self._city_name_to_char[station.city_name])
         packet.add_n_byte_number(self.TWO_BYTES, station.code)

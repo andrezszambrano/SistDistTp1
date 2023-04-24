@@ -8,7 +8,7 @@ class ClientProtocol(Protocol):
 
     def add_stations_chunk_to_packet(self, packet, stations_list):
         for station in stations_list:
-            super()._add_station_to_packet(packet, station)
+            super().add_station_to_packet(packet, station)
 
     def add_weather_chunk_to_packet(self, packet, weather_list):
         for weather in weather_list:
