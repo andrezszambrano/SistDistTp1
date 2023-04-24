@@ -1,15 +1,16 @@
 from datetime import datetime
 
 from .chunk_file_reader import ChunkFileReader
-from .sender import FINISHED, WEATHER_DATA, STATION_DATA
+from .sender import FINISHED, WEATHER_DATA, STATION_DATA, TRIP_DATA
 from .station import Station
 from .weather import Weather
+from .trip import Trip
 
 DATA_PATH = "data/"
 FIVE_MB = 5 * 1024 * 1024  # 5 MB
 WEATHER = "weather.csv"
 STATIONS = "stations.csv"
-
+TRIPS = "trips.csv"
 
 def row_to_weather_obj(row, city_name):
     return Weather(city_name, datetime.strptime(row[0], '%Y-%m-%d').date(), float(row[1]), float(row[2]), float(row[3]),
@@ -23,6 +24,15 @@ def row_to_station_obj(row, city_name):
     longitude = None if row[3] == '' else float(row[3])
     return Station(city_name, int(row[0]), row[1], latitude, longitude, int(row[4]))
 
+def row_to_trip_obj(row, city_name):
+    IS_MEMBER = 1
+    duration = int(round(float(row[4])))
+    if duration < 0:
+        duration = 0
+    return Trip(city_name, datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S'), int(row[1]),
+                datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S'), int(row[3]), duration,
+                int(row[5]) == IS_MEMBER, int(row[6]))
+
 
 class CityDataReader:
     def __init__(self, city_name, queue):
@@ -30,12 +40,15 @@ class CityDataReader:
         self._queue = queue
 
     def run(self):
-        weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", FIVE_MB,
-                                                  row_to_weather_obj, self._city_name)
-        self.__send_chunks(weather_chunk_generator, WEATHER_DATA)
-        stations_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{STATIONS}", FIVE_MB,
-                                                   row_to_station_obj, self._city_name)
-        self.__send_chunks(stations_chunk_generator, STATION_DATA)
+        #weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", FIVE_MB,
+        #                                          row_to_weather_obj, self._city_name)
+        #self.__send_chunks(weather_chunk_generator, WEATHER_DATA)
+        #stations_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{STATIONS}", FIVE_MB,
+        #                                           row_to_station_obj, self._city_name)
+        #self.__send_chunks(stations_chunk_generator, STATION_DATA)
+        trips_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{TRIPS}", 5 * 1024,
+                                                   row_to_trip_obj, self._city_name)
+        self.__send_chunks(trips_chunk_generator, TRIP_DATA)
         self._queue.put(FINISHED)
 
     def __send_chunks(self, chunk_generator, data_type):

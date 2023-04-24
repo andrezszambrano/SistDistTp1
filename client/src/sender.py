@@ -5,6 +5,7 @@ from .socket_wrapper import Socket
 
 WEATHER_DATA = "W"
 STATION_DATA = "S"
+TRIP_DATA = "T"
 FINISHED = "F"
 
 class Sender:
@@ -23,8 +24,13 @@ class Sender:
                 counter = counter + 1
                 keep_receiving = not (counter == 3)
             elif data[0] == WEATHER_DATA:
+                continue
                 communication_handler.send_weather_data(data[1])
-            else:
+            elif data[0] == STATION_DATA:
+                continue
                 communication_handler.send_station_data(data[1])
+            else:
+                communication_handler.send_trip_data(data[1])
+                break
         communication_handler.send_finished()
         self._socket.shutdown_and_close()

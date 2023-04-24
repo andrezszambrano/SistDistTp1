@@ -6,6 +6,7 @@ from .actions.finished_action import FinishedAction
 from .protocol import Protocol
 from .weather import Weather
 from .station import Station
+from .trip import Trip
 
 
 class ServerProtocol(Protocol):
@@ -21,10 +22,13 @@ class ServerProtocol(Protocol):
             return AckAction()
         if message_type == super().WEATHER_DATA:
             weather_data = self.__recv_weather_data(byte_stream)
-            return DataAction(self.WEATHER_DATA, weather_data)
-        else:
+            return DataAction(super().WEATHER_DATA, weather_data)
+        elif message_type == super().STATION_DATA:
             station_data = self.__recv_station_data(byte_stream)
-            return DataAction(self.STATION_DATA, station_data)
+            return DataAction(super().STATION_DATA, station_data)
+        else:
+            trip_data = self.__recv_trip_data(byte_stream)
+            return DataAction(super().TRIP_DATA, trip_data)
 
     def __get_city_name(self, byte_stream):
         city_char = super()._recv_byte(byte_stream)
@@ -95,3 +99,16 @@ class ServerProtocol(Protocol):
         longitude = super()._recv_float_else_none(byte_stream)
         yearid = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
         return Station(city, code, name, latitude, longitude, yearid)
+
+    def __recv_trip_data(self, byte_stream):
+        city = self.__get_city_name(byte_stream)
+        start_date_time = super()._recv_date_time(byte_stream)
+        logging.debug(f"Date: {start_date_time}")
+        start_station_code = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
+        end_date_time = super()._recv_date_time(byte_stream)
+        end_station_code = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
+        duration_sec = super()._recv_n_byte_number(byte_stream, super().FOUR_BYTES)
+        is_member = super()._recv_boolean(byte_stream)
+        yearid = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
+        return Trip(city, start_date_time, start_station_code, end_date_time, end_station_code, duration_sec, is_member,
+                    yearid)

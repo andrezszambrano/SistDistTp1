@@ -1,4 +1,6 @@
 import datetime
+import logging
+from datetime import datetime
 import struct
 
 MONTREAL = "montreal"
@@ -10,6 +12,7 @@ class Protocol:
     FLOAT = 'F'
     WEATHER_DATA = 'W'
     STATION_DATA = 'S'
+    TRIP_DATA = 'T'
     FINISHED = 'F'
     ASK_ACK = 'A'
     ACK = 'O'
@@ -34,6 +37,15 @@ class Protocol:
         date_len = self._recv_n_byte_number(byte_stream, self.ONE_BYTE)
         date_str = byte_stream.read(date_len).decode('utf-8')
         return datetime.date.fromisoformat(date_str)
+
+    def _recv_date_time(self, byte_stream):
+        date_time_len = self._recv_n_byte_number(byte_stream, self.ONE_BYTE)
+        date_time_str = byte_stream.read(date_time_len).decode('utf-8')
+        return datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+
+    def _recv_boolean(self, byte_stream):
+        i = self._recv_n_byte_number(byte_stream, self.ONE_BYTE)
+        return True if i == 1 else False
 
     def _recv_float_else_none(self, byte_stream):
         aux = self._recv_byte(byte_stream)
@@ -86,6 +98,17 @@ class Protocol:
         self._add_float_else_none(packet, weather.ws10m_max)
         self._add_float_else_none(packet, weather.ws50m)
         self._add_float_else_none(packet, weather.ws10m)
+
+    def add_trip_to_packet(self, packet, trip):
+        packet.add_byte(self.TRIP_DATA)
+        packet.add_byte(self._city_name_to_char[trip.city_name])
+        packet.add_data_and_time(trip.start_date_time)
+        packet.add_n_byte_number(self.TWO_BYTES, trip.start_station_code)
+        packet.add_data_and_time(trip.end_date_time)
+        packet.add_n_byte_number(self.TWO_BYTES, trip.end_station_code)
+        packet.add_n_byte_number(self.FOUR_BYTES, trip.duration_sec)
+        packet.add_boolean(trip.is_member)
+        packet.add_n_byte_number(self.TWO_BYTES, trip.yearid)
 
     def add_finished_to_packet(self, packet):
         packet.add_byte(self.FINISHED)
