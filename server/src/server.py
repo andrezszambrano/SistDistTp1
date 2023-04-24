@@ -5,7 +5,6 @@ from .acceptor_socket import AcceptorSocket
 from .data_distributer import DataDistributer
 from .mutable_boolean import MutableBoolean
 from .queues.prod_cons_queue import ProdConsQueue
-from .server_protocol import ServerProtocol
 from .communication_handler import CommunicationHandler
 
 

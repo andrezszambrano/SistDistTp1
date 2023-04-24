@@ -1,7 +1,5 @@
 import logging
-from .packet import Packet
 from .action import Action
-from .protocol import Protocol
 
 
 class DataAction(Action):

@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 
 from .chunk_file_reader import ChunkFileReader

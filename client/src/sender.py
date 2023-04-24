@@ -1,9 +1,6 @@
-import logging
 
-from .client_protocol import ClientProtocol
 from .communication_handler import CommunicationHandler
 from .socket_wrapper import Socket
-from .packet import Packet
 
 WEATHER_DATA = "W"
 STATION_DATA = "S"
