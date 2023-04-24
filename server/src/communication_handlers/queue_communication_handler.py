@@ -27,7 +27,7 @@ class QueueCommunicationHandler:
         protocol.add_weather_to_packet(packet, weather_data, throw_unnecessary_data=True)
         self._queue.send(packet)
 
-    def send_data_to_duplicated_station_process(self, station_data):
+    def send_data_to_station_processes(self, station_data):
         packet = Packet()
         protocol = ServerProtocol()
         protocol.add_station_to_packet(packet, station_data)
