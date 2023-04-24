@@ -22,9 +22,7 @@ class Server:
         client_communicator_handler = SocketCommunicationHandler(socket)
         distributor_communicator_handler = QueueCommunicationHandler(queue=self._prod_cons_queue)
         finished_bool = MutableBoolean(False)
-        data_distributer = DataDistributer(self._prod_cons_queue)
-        data_distributer_process = Process(target=data_distributer.run, args=(), daemon=True)
-        data_distributer_process.start()
+        data_distributer_process = self.__run_data_distributer_process()
         while not finished_bool.get_boolean():
             action = client_communicator_handler.recv_action()
             action.perform_action(finished_bool, client_communicator_handler, distributor_communicator_handler)
@@ -32,3 +30,9 @@ class Server:
         socket.shutdown_and_close()
         self._acceptor_socket.shutdown_and_close()
         logging.debug(f"finished")
+
+    def __run_data_distributer_process(self):
+        data_distributer = DataDistributer(self._prod_cons_queue)
+        data_distributer_process = Process(target=data_distributer.run, args=(), daemon=True)
+        data_distributer_process.start()
+        return data_distributer_process
