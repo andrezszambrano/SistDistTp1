@@ -34,7 +34,7 @@ class ServerProtocol(Protocol):
         if data_type == super().STATION_DATA:
             self._add_station_to_packet(packet, data)
         else:
-            self._add_weather_to_packet(packet, data)
+            self.add_weather_to_packet(packet, data)
 
     def recv_data_distributer_action(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)

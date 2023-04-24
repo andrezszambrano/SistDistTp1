@@ -12,7 +12,7 @@ class ClientProtocol(Protocol):
 
     def add_weather_chunk_to_packet(self, packet, weather_list):
         for weather in weather_list:
-            super()._add_weather_to_packet(packet, weather)
+            super().add_weather_to_packet(packet, weather)
 
     def add_request_for_ack_to_packet(self, packet):
         packet.add_byte(super().ASK_ACK)

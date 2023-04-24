@@ -1,4 +1,6 @@
 import logging
+
+from ..protocol import Protocol
 from .action import Action
 
 
@@ -12,4 +14,5 @@ class DataAction(Action):
         distributor_communicator_handler.send_data_to_distributer(self._data_type, self._data)
 
     def perform_action_(self, _finished_bool, weather_communication_handler):
-        weather_communication_handler.send_data_to_weather_process(self._data_type, self._data)
+        if self._data_type == Protocol().WEATHER_DATA:
+            weather_communication_handler.send_data_to_weather_process(self._data)

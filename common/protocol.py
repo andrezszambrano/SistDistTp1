@@ -59,7 +59,7 @@ class Protocol:
         self._add_float_else_none(packet, station.longitude)
         packet.add_n_byte_number(self.TWO_BYTES, station.yearid)
 
-    def _add_weather_to_packet(self, packet, weather):
+    def add_weather_to_packet(self, packet, weather):
         packet.add_byte(self.WEATHER_DATA)
         packet.add_byte(self._city_name_to_char[weather.city_name])
         packet.add_date(weather.date)

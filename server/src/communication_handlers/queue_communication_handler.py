@@ -20,10 +20,10 @@ class QueueCommunicationHandler:
         protocol.add_data_to_packet(packet, data_type, data)
         self._queue.send(packet)
 
-    def send_data_to_weather_process(self, data_type, data):
+    def send_data_to_weather_process(self, data):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_data_to_packet(packet, data_type, data)
+        protocol.add_weather_to_packet(packet, data)
         self._queue.send(packet)
 
     def recv_data_distributer_action(self):
