@@ -1,7 +1,7 @@
 
-from .ack_action import AckAction
-from .data_action import DataAction
-from .finished_action import FinishedAction
+from .actions.ack_action import AckAction
+from .actions.data_action import DataAction
+from .actions.finished_action import FinishedAction
 from .protocol import Protocol
 from .weather import Weather
 from .station import Station
