@@ -1,8 +1,9 @@
 
 
 class Weather:
-    def __init__(self, date, prectot, qv2m, rh2m, ps, t2m_range, ts, t2mdew, t2mwet, t2m_max, t2m_min, t2m, ws50m_range,
+    def __init__(self, city_name, date, prectot, qv2m, rh2m, ps, t2m_range, ts, t2mdew, t2mwet, t2m_max, t2m_min, t2m, ws50m_range,
                  ws10m_range, ws50m_min, ws10m_min, ws50m_max, ws10m_max, ws50m, ws10m):
+        self.city_name = city_name
         self.date = date
         self.prectot = prectot
         self.qv2m = qv2m

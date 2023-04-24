@@ -14,16 +14,16 @@ class QueueCommunicationHandler:
         protocol.add_finished_to_packet(packet)
         self._queue.send(packet)
 
-    def send_data_to_distributer(self, data_type, city_name, data):
+    def send_data_to_distributer(self, data_type, data):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_data_to_packet(packet, data_type, city_name, data)
+        protocol.add_data_to_packet(packet, data_type, data)
         self._queue.send(packet)
 
-    def send_data_to_weather_process(self, data_type, city_name, data):
+    def send_data_to_weather_process(self, data_type, data):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_data_to_packet(packet, data_type, city_name, data)
+        protocol.add_data_to_packet(packet, data_type, data)
         self._queue.send(packet)
 
     def recv_data_distributer_action(self):

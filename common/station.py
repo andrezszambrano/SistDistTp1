@@ -1,7 +1,8 @@
 
 
 class Station:
-    def __init__(self, code, name, latitude, longitude, yearid):
+    def __init__(self, city_name, code, name, latitude, longitude, yearid):
+        self.city_name = city_name
         self.code = code
         self.name = name
         self.latitude = latitude

@@ -50,18 +50,18 @@ class Protocol:
             packet.add_byte(self.FLOAT)
             packet.add_float(float_number)
 
-    def _add_station_to_packet(self, packet, city_name, station):
+    def _add_station_to_packet(self, packet, station):
         packet.add_byte(self.STATION_DATA)
-        packet.add_byte(self._city_name_to_char[city_name])
+        packet.add_byte(self._city_name_to_char[station.city_name])
         packet.add_n_byte_number(self.TWO_BYTES, station.code)
         packet.add_string_and_length(station.name)
         self._add_float_else_none(packet, station.latitude)
         self._add_float_else_none(packet, station.longitude)
         packet.add_n_byte_number(self.TWO_BYTES, station.yearid)
 
-    def _add_weather_to_packet(self, packet, city_name, weather):
+    def _add_weather_to_packet(self, packet, weather):
         packet.add_byte(self.WEATHER_DATA)
-        packet.add_byte(self._city_name_to_char[city_name])
+        packet.add_byte(self._city_name_to_char[weather.city_name])
         packet.add_date(weather.date)
         self._add_float_else_none(packet, weather.prectot)
         self._add_float_else_none(packet, weather.qv2m)

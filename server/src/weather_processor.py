@@ -17,5 +17,7 @@ class WeatherProcessor:
             if weather_data is None:
                 break
             elif weather_data.prectot > self.MIN_PRECTOT:
-                self._days_that_rained_in_city.add((weather_data.date))
-        logging.debug(f"Days that rained: {self._days_that_rained_in_city}")
+                self._days_that_rained_in_city.add((weather_data.city_name, weather_data.date))
+        logging.debug("Days that rained:")
+        for day in self._days_that_rained_in_city:
+            logging.debug(f"{day}")

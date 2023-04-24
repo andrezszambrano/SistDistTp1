@@ -23,9 +23,9 @@ class Sender:
                 counter = counter + 1
                 keep_receiving = not (counter == 3)
             elif data[0] == WEATHER_DATA:
-                communication_handler.send_weather_data(data[1], data[2])
+                communication_handler.send_weather_data(data[1])
             else:
                 continue
-                communication_handler.send_station_data(data[1], data[2])
+                communication_handler.send_station_data(data[1])
         communication_handler.send_finished()
         self._socket.shutdown_and_close()
