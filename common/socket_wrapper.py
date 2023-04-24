@@ -1,8 +1,12 @@
 import socket
 
-class Socket:
+from .byte_stream import ByteStream
+
+
+class Socket(ByteStream):
 
     def __init__(self, host, port, created_socket = None):
+        super(Socket, self).__init__()
         _socket = None
         if created_socket != None:
             _socket = created_socket
@@ -24,7 +28,7 @@ class Socket:
             aux = self._socket.send(buffer[sent:])
             sent = sent + aux
 
-    def recv(self, length):
+    def read(self, length):
         received_data = b""
         while len(received_data) < length:
             data_chunk = self._socket.recv(length - len(received_data))
