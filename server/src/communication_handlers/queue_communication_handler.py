@@ -23,7 +23,7 @@ class QueueCommunicationHandler:
     def send_data_to_weather_process(self, data):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_weather_to_packet(packet, data)
+        protocol.add_weather_to_packet(packet, data, throw_unnecessary_data=True)
         self._queue.send(packet)
 
     def recv_data_distributer_action(self):
