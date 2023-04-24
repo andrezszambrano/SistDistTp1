@@ -23,7 +23,6 @@ class Sender:
                 counter = counter + 1
                 keep_receiving = not (counter == 3)
             elif data[0] == WEATHER_DATA:
-                continue
                 communication_handler.send_weather_data(data[1])
             else:
                 communication_handler.send_station_data(data[1])

@@ -1,6 +1,6 @@
 import logging
 
-from .communication_handlers.queue_communication_handler import QueueCommunicationHandler
+from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 
 
 class WeatherProcessor:

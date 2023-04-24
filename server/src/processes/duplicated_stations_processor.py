@@ -1,10 +1,9 @@
 import logging
 
-from .communication_handlers.queue_communication_handler import QueueCommunicationHandler
-from .protocol import MONTREAL
+from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 
 
-class MontrealProcessor:
+class DuplicatedStationsProcessor:
     def __init__(self, data_queue, queue_id):
         self._data_queue = data_queue
         self._queue_id = queue_id
@@ -16,8 +15,7 @@ class MontrealProcessor:
             station_data = communication_handler.recv_station_data()
             if station_data is None:
                 break
-            if station_data.city_name == MONTREAL:
-                self._stations.add((station_data.city_name, station_data.code))
-        #logging.debug("Montreal stations:")
+            self._stations.add((station_data.city_name, station_data.code))
+        logging.debug("Stations:")
         for station in self._stations:
             logging.debug(f"{station}")

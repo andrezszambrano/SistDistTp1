@@ -4,7 +4,7 @@ from multiprocessing import Process
 from .acceptor_socket import AcceptorSocket
 from .communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from .communication_handlers.socket_communication_handler import SocketCommunicationHandler
-from .data_distributer import DataDistributer
+from .processes.data_distributer import DataDistributer
 from .mutable_boolean import MutableBoolean
 from .queues.prod_cons_queue import ProdConsQueue
 
