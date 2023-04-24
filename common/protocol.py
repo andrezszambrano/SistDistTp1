@@ -50,5 +50,38 @@ class Protocol:
             packet.add_byte(self.FLOAT)
             packet.add_float(float_number)
 
+    def _add_station_to_packet(self, packet, city_name, station):
+        packet.add_byte(self.STATION_DATA)
+        packet.add_byte(self._city_name_to_char[city_name])
+        packet.add_n_byte_number(self.TWO_BYTES, station.code)
+        packet.add_string_and_length(station.name)
+        self._add_float_else_none(packet, station.latitude)
+        self._add_float_else_none(packet, station.longitude)
+        packet.add_n_byte_number(self.TWO_BYTES, station.yearid)
+
+    def _add_weather_to_packet(self, packet, city_name, weather):
+        packet.add_byte(self.WEATHER_DATA)
+        packet.add_byte(self._city_name_to_char[city_name])
+        packet.add_date(weather.date)
+        self._add_float_else_none(packet, weather.prectot)
+        self._add_float_else_none(packet, weather.qv2m)
+        self._add_float_else_none(packet, weather.rh2m)
+        self._add_float_else_none(packet, weather.ps)
+        self._add_float_else_none(packet, weather.t2m_range)
+        self._add_float_else_none(packet, weather.ts)
+        self._add_float_else_none(packet, weather.t2mdew)
+        self._add_float_else_none(packet, weather.t2mwet)
+        self._add_float_else_none(packet, weather.t2m_max)
+        self._add_float_else_none(packet, weather.t2m_min)
+        self._add_float_else_none(packet, weather.t2m)
+        self._add_float_else_none(packet, weather.ws50m_range)
+        self._add_float_else_none(packet, weather.ws10m_range)
+        self._add_float_else_none(packet, weather.ws50m_min)
+        self._add_float_else_none(packet, weather.ws10m_min)
+        self._add_float_else_none(packet, weather.ws50m_max)
+        self._add_float_else_none(packet, weather.ws10m_max)
+        self._add_float_else_none(packet, weather.ws50m)
+        self._add_float_else_none(packet, weather.ws10m)
+
     def add_finished_to_packet(self, packet):
         packet.add_byte(self.FINISHED)

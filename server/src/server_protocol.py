@@ -33,44 +33,11 @@ class ServerProtocol(Protocol):
         city_char = super()._recv_byte(byte_stream)
         return list(self._city_name_to_char.keys())[list(self._city_name_to_char.values()).index(city_char)]
 
-    def __add_station_to_packet(self, packet, city_name, station):
-        packet.add_byte(super().STATION_DATA)
-        packet.add_byte(self._city_name_to_char[city_name])
-        packet.add_n_byte_number(super().TWO_BYTES, station.code)
-        packet.add_string_and_length(station.name)
-        super()._add_float_else_none(packet, station.latitude)
-        super()._add_float_else_none(packet, station.longitude)
-        packet.add_n_byte_number(super().TWO_BYTES, station.yearid)
-
-    def __add_weather_to_packet(self, packet, city_name, weather):
-        packet.add_byte(super().WEATHER_DATA)
-        packet.add_byte(self._city_name_to_char[city_name])
-        packet.add_date(weather.date)
-        super()._add_float_else_none(packet, weather.prectot)
-        super()._add_float_else_none(packet, weather.qv2m)
-        super()._add_float_else_none(packet, weather.rh2m)
-        super()._add_float_else_none(packet, weather.ps)
-        super()._add_float_else_none(packet, weather.t2m_range)
-        super()._add_float_else_none(packet, weather.ts)
-        super()._add_float_else_none(packet, weather.t2mdew)
-        super()._add_float_else_none(packet, weather.t2mwet)
-        super()._add_float_else_none(packet, weather.t2m_max)
-        super()._add_float_else_none(packet, weather.t2m_min)
-        super()._add_float_else_none(packet, weather.t2m)
-        super()._add_float_else_none(packet, weather.ws50m_range)
-        super()._add_float_else_none(packet, weather.ws10m_range)
-        super()._add_float_else_none(packet, weather.ws50m_min)
-        super()._add_float_else_none(packet, weather.ws10m_min)
-        super()._add_float_else_none(packet, weather.ws50m_max)
-        super()._add_float_else_none(packet, weather.ws10m_max)
-        super()._add_float_else_none(packet, weather.ws50m)
-        super()._add_float_else_none(packet, weather.ws10m)
-
     def add_data_to_packet(self, packet, data_type, city_name, data):
         if data_type == super().STATION_DATA:
-            self.__add_station_to_packet(packet, city_name, data)
+            self._add_station_to_packet(packet, city_name, data)
         else:
-            self.__add_weather_to_packet(packet, city_name, data)
+            self._add_weather_to_packet(packet, city_name, data)
 
     def recv_data_distributer_action(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)

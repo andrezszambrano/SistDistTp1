@@ -8,38 +8,11 @@ class ClientProtocol(Protocol):
 
     def add_stations_chunk_to_packet(self, packet, city_name, stations_list):
         for station in stations_list:
-            packet.add_byte(super().STATION_DATA)
-            packet.add_byte(self._city_name_to_char[city_name])
-            packet.add_n_byte_number(super().TWO_BYTES, station.code)
-            packet.add_string_and_length(station.name)
-            super()._add_float_else_none(packet, station.latitude)
-            super()._add_float_else_none(packet, station.longitude)
-            packet.add_n_byte_number(super().TWO_BYTES, station.yearid)
+            super()._add_station_to_packet(packet, city_name, station)
 
     def add_weather_chunk_to_packet(self, packet, city_name, weather_list):
         for weather in weather_list:
-            packet.add_byte(super().WEATHER_DATA)
-            packet.add_byte(self._city_name_to_char[city_name])
-            packet.add_date(weather.date)
-            super()._add_float_else_none(packet, weather.prectot)
-            super()._add_float_else_none(packet, weather.qv2m)
-            super()._add_float_else_none(packet, weather.rh2m)
-            super()._add_float_else_none(packet, weather.ps)
-            super()._add_float_else_none(packet, weather.t2m_range)
-            super()._add_float_else_none(packet, weather.ts)
-            super()._add_float_else_none(packet, weather.t2mdew)
-            super()._add_float_else_none(packet, weather.t2mwet)
-            super()._add_float_else_none(packet, weather.t2m_max)
-            super()._add_float_else_none(packet, weather.t2m_min)
-            super()._add_float_else_none(packet, weather.t2m)
-            super()._add_float_else_none(packet, weather.ws50m_range)
-            super()._add_float_else_none(packet, weather.ws10m_range)
-            super()._add_float_else_none(packet, weather.ws50m_min)
-            super()._add_float_else_none(packet, weather.ws10m_min)
-            super()._add_float_else_none(packet, weather.ws50m_max)
-            super()._add_float_else_none(packet, weather.ws10m_max)
-            super()._add_float_else_none(packet, weather.ws50m)
-            super()._add_float_else_none(packet, weather.ws10m)
+            super()._add_weather_to_packet(packet, city_name, weather)
 
     def add_request_for_ack_to_packet(self, packet):
         packet.add_byte(super().ASK_ACK)
