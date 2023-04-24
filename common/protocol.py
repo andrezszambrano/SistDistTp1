@@ -1,6 +1,4 @@
-import datetime
-import logging
-from datetime import datetime
+from datetime import datetime, date
 import struct
 
 MONTREAL = "montreal"
@@ -36,7 +34,7 @@ class Protocol:
     def _recv_date(self, byte_stream):
         date_len = self._recv_n_byte_number(byte_stream, self.ONE_BYTE)
         date_str = byte_stream.read(date_len).decode('utf-8')
-        return datetime.date.fromisoformat(date_str)
+        return date.fromisoformat(date_str)
 
     def _recv_date_time(self, byte_stream):
         date_time_len = self._recv_n_byte_number(byte_stream, self.ONE_BYTE)

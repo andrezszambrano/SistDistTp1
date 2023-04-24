@@ -35,10 +35,12 @@ class ServerProtocol(Protocol):
         return list(self._city_name_to_char.keys())[list(self._city_name_to_char.values()).index(city_char)]
 
     def add_data_to_packet(self, packet, data_type, data):
-        if data_type == super().STATION_DATA:
+        if data_type == super().WEATHER_DATA:
+            self.add_weather_to_packet(packet, data)
+        elif data_type == super().STATION_DATA:
             self.add_station_to_packet(packet, data)
         else:
-            self.add_weather_to_packet(packet, data)
+            self.add_trip_to_packet(packet, data)
 
     def recv_data_distributer_action(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
@@ -46,10 +48,13 @@ class ServerProtocol(Protocol):
             return FinishedAction()
         if message_type == super().WEATHER_DATA:
             weather_data = self.__recv_weather_data(byte_stream)
-            return DataAction(self.WEATHER_DATA, weather_data)
-        else:
+            return DataAction(super().WEATHER_DATA, weather_data)
+        elif message_type == super().STATION_DATA:
             station_data = self.__recv_station_data(byte_stream)
-            return DataAction(self.STATION_DATA, station_data)
+            return DataAction(super().STATION_DATA, station_data)
+        else:
+            trip_data = self.__recv_trip_data(byte_stream)
+            return DataAction(super().TRIP_DATA, trip_data)
 
     def add_ack_to_packet(self, packet):
         packet.add_byte(super().ACK)
@@ -89,7 +94,7 @@ class ServerProtocol(Protocol):
         ws50m = super()._recv_float_else_none(byte_stream)
         ws10m = super()._recv_float_else_none(byte_stream)
         return Weather(city, date, prectot, qv2m, rh2m, ps, t2m_range, ts, t2mdew, t2mwet, t2m_max, t2m_min, t2m, ws50m_range,
-                 ws10m_range, ws50m_min, ws10m_min, ws50m_max, ws10m_max, ws50m, ws10m)
+                       ws10m_range, ws50m_min, ws10m_min, ws50m_max, ws10m_max, ws50m, ws10m)
 
     def __recv_station_data(self, byte_stream):
         city = self.__get_city_name(byte_stream)
