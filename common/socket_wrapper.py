@@ -5,6 +5,8 @@ from .packet_sender import PacketSender
 
 
 class Socket(ByteStream, PacketSender):
+    MAX_CHUNK_SIZE = 8 * 1024  # 8KB
+
 
     def __init__(self, host, port, created_socket = None):
         super(Socket, self).__init__()
@@ -38,4 +40,8 @@ class Socket(ByteStream, PacketSender):
 
     def send(self, packet):
         bytes = packet.get_bytes()
-        self.__send(bytes, len(bytes))
+        offset = 0
+        while offset < len(bytes):
+            chunk = bytes[offset:offset + self.MAX_CHUNK_SIZE]
+            self.__send(chunk, len(chunk))
+            offset += len(chunk)

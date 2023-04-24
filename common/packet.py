@@ -6,7 +6,6 @@ ONE_BYTE = 1
 TWO_BYTES = 2
 
 class Packet(ByteStream):
-    MAX_CHUNK_SIZE = 8 * 1024  # 8KB
 
     def __init__(self, bytes=b""):
         super(Packet).__init__()
@@ -39,13 +38,6 @@ class Packet(ByteStream):
         date_bytes = date.strftime("%Y-%m-%d").strip('"').encode('utf-8')
         self.add_n_byte_number(ONE_BYTE, len(date_bytes))
         self.__concatenate_bytes(date_bytes)
-
-    def send_to_socket(self, socket):
-        offset = 0
-        while offset < len(self._bytes):
-            chunk = self._bytes[offset:offset + self.MAX_CHUNK_SIZE]
-            socket.send(chunk, len(chunk))
-            offset += len(chunk)
 
     def read(self, length):
         bytes = self._bytes[self._read_counter: self._read_counter + length]
