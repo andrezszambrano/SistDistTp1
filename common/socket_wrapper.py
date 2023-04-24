@@ -1,9 +1,10 @@
 import socket
 
 from .byte_stream import ByteStream
+from .packet_sender import PacketSender
 
 
-class Socket(ByteStream):
+class Socket(ByteStream, PacketSender):
 
     def __init__(self, host, port, created_socket = None):
         super(Socket, self).__init__()
@@ -34,7 +35,6 @@ class Socket(ByteStream):
             data_chunk = self._socket.recv(length - len(received_data))
             received_data = received_data + data_chunk
         return received_data
-
 
     def send(self, packet):
         bytes = packet.get_bytes()

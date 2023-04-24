@@ -29,6 +29,9 @@ class ServerProtocol(Protocol):
             station_data = self.__recv_station_data(byte_stream)
             return DataAction(self.STATION_DATA, city, station_data)
 
+    def recv_data_distributer_action(self, byte_stream):
+        pass
+
     def add_ack_to_packet(self, packet):
         packet.add_byte(super().ACK)
 

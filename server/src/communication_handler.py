@@ -14,5 +14,10 @@ class CommunicationHandler:
 
     def recv_action(self):
         protocol = ServerProtocol()
-        #packet = queue.pop()
         return protocol.recv_action(self._socket)
+
+    def recv_data_distributer_action(self, queue):
+        protocol = ServerProtocol()
+        packet = queue.pop()
+        return protocol.recv_data_distributer_action(packet)
+

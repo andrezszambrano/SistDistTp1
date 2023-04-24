@@ -1,4 +1,5 @@
 from .mutable_boolean import MutableBoolean
+from .communication_handler import CommunicationHandler
 
 
 class DataDistributer:
@@ -7,19 +8,7 @@ class DataDistributer:
 
     def run(self):
         finished_bool = MutableBoolean(False)
+        communication_handler = CommunicationHandler(self._queue)
         while True:
-            action = self.__get_action_from_queue()
+            action = communication_handler.recv_data_distributer_action()
             action.perform_action(finished_bool)
-
-
-    def __get_action_from_queue(self):
-        bytes = self._queue.get()
-        type = bytes.read(1)
-
-        while byte != b"":
-            # Do something with the byte
-            print(byte)
-            byte = f.read(1)
-
-    def __read_n_bytes(self, bytes, n):
-        return bytes.read(n)

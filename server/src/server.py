@@ -15,7 +15,7 @@ class Server:
         self._client_sock = None
         self._acceptor_socket = AcceptorSocket('', port, listen_backlog)
         self._client_processes = []
-        #self._prod_cons_queue = ProdConsQueue()
+        self._prod_cons_queue = ProdConsQueue()
 
     def run(self):
         socket = self._acceptor_socket.accept()
