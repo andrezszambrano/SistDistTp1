@@ -29,7 +29,6 @@ class CommunicationHandler:
         protocol.add_data_to_packet(packet, data_type, city_name, data)
         self._queue.send(packet)
 
-
     def recv_data_distributer_action(self, queue):
         protocol = ServerProtocol()
         packet = queue.get_packet()
