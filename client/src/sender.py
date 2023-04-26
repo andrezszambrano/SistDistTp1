@@ -26,7 +26,6 @@ class Sender:
                 counter = counter + 1
                 keep_receiving = not (counter == 3)
             elif data[0] == (WEATHER_FINISHED):
-                logging.debug(f"here")
                 weather_finished_counter = weather_finished_counter + 1
                 if weather_finished_counter == 3:
                     communication_handler.send_weather_finished()
