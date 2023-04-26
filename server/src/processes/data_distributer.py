@@ -20,12 +20,15 @@ class DataDistributer:
         self._data_queue = data_queue
         self._weather_queue = ProdConsQueue()
         self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
+        self._trips_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
 
     def run(self):
         finished_bool = MutableBoolean(False)
         server_communication_handler = QueueCommunicationHandler(self._data_queue)
         weather_communication_handler = QueueCommunicationHandler(self._weather_queue)
         stations_communication_handler = QueueCommunicationHandler(self._stations_queue)
+        trips_communication_handler = QueueCommunicationHandler(self._trips_queue)
+
         weather_processor = self.__create_and_run_weather_processor()
         duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
         montreal_processor = self.__create_and_run_montreal_processor()
@@ -38,7 +41,7 @@ class DataDistributer:
         montreal_processor.join()
 
     def __create_and_run_weather_processor(self):
-        weather_processor = WeatherProcessor(self._weather_queue)
+        weather_processor = WeatherProcessor(self._weather_queue, (self._trips_queue, 0))
         weather_processor_process = Process(target=weather_processor.run, args=(), daemon=False)
         weather_processor_process.start()
         return weather_processor_process
