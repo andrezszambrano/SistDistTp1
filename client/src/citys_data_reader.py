@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from .chunk_file_reader import ChunkFileReader
-from .sender import FINISHED, WEATHER_DATA, STATION_DATA, TRIP_DATA
+from .sender import FINISHED, WEATHER_DATA, STATION_DATA, TRIP_DATA, WEATHER_FINISHED
 from .station import Station
 from .weather import Weather
 from .trip import Trip
@@ -43,18 +43,24 @@ class CityDataReader:
     def run(self):
         weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", FIVE_MB,
                                                   row_to_weather_obj, self._city_name)
-        self.__send_chunks(weather_chunk_generator, WEATHER_DATA)
+        self.__send_chunks(weather_chunk_generator, WEATHER_DATA, WEATHER_FINISHED)
         logging.info(f"{self._city_name}: Weather data read")
         stations_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{STATIONS}", FIVE_MB,
                                                    row_to_station_obj, self._city_name)
-        self.__send_chunks(stations_chunk_generator, STATION_DATA)
+        self.__send_chunks(stations_chunk_generator, STATION_DATA, 'p')
         logging.info(f"{self._city_name}: Station data read")
         trips_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{TRIPS}", 5 * 1024,
                                                    row_to_trip_obj, self._city_name)
-        self.__send_chunks(trips_chunk_generator, TRIP_DATA)
+        self.__send_chunks(trips_chunk_generator, TRIP_DATA, 'o')
         logging.info(f"{self._city_name}: Trip data read")
         self._queue.put(FINISHED)
 
-    def __send_chunks(self, chunk_generator, data_type):
-        for chunk in chunk_generator.get_chunks():
-            self._queue.put((data_type, chunk))
+    def __send_chunks(self, chunk_generator, data_type, finished_char):
+        if data_type == TRIP_DATA:
+            for chunk in chunk_generator.get_chunks():
+                self._queue.put((data_type, chunk))
+                break
+        else:
+            for chunk in chunk_generator.get_chunks():
+                self._queue.put((data_type, chunk))
+        self._queue.put(finished_char)

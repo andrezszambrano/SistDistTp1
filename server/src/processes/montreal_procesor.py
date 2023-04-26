@@ -18,6 +18,4 @@ class MontrealProcessor:
                 break
             if station_data.city_name == MONTREAL:
                 self._stations.add((station_data.city_name, station_data.code))
-        logging.debug(f"Montreal stations:{self._stations}")
-        #for station in self._stations:
-         #   logging.debug(f"{station}")
+        #logging.debug(f"Montreal stations:{self._stations}")

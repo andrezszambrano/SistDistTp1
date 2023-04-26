@@ -21,6 +21,12 @@ class QueueCommunicationHandler:
         protocol.add_data_to_packet(packet, data_type, data)
         self._queue.send(packet)
 
+    def send_weather_finished_to_distributer(self):
+        packet = Packet()
+        protocol = ServerProtocol()
+        protocol.add_weather_finished_to_packet(packet)
+        self._queue.send(packet)
+
     def send_data_to_weather_process(self, weather_data):
         packet = Packet()
         protocol = ServerProtocol()
@@ -31,6 +37,12 @@ class QueueCommunicationHandler:
         packet = Packet()
         protocol = ServerProtocol()
         protocol.add_station_to_packet(packet, station_data)
+        self._queue.send(packet)
+
+    def send_trip_data_to_processes(self, trip_data):
+        packet = Packet()
+        protocol = ServerProtocol()
+        protocol.add_trip_to_packet(packet, trip_data)
         self._queue.send(packet)
 
     def recv_data_distributer_action(self):
@@ -47,3 +59,8 @@ class QueueCommunicationHandler:
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_station_data_or_finished(packet)
+
+    def recv_trip_data(self):
+        protocol = ServerProtocol()
+        packet = self._queue.get_packet(self._queue_id)
+        return protocol.recv_trip_data_or_finished(packet)

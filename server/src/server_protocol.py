@@ -3,6 +3,7 @@ import logging
 from .actions.ack_action import AckAction
 from .actions.data_action import DataAction
 from .actions.finished_action import FinishedAction
+from .actions.weather_finished_action import WeatherFinishedAction
 from .protocol import Protocol
 from .weather import Weather
 from .station import Station
@@ -26,9 +27,11 @@ class ServerProtocol(Protocol):
         elif message_type == super().STATION_DATA:
             station_data = self.__recv_station_data(byte_stream)
             return DataAction(super().STATION_DATA, station_data)
-        else:
+        elif message_type == super().TRIP_DATA:
             trip_data = self.__recv_trip_data(byte_stream)
             return DataAction(super().TRIP_DATA, trip_data)
+        else:
+            return WeatherFinishedAction()
 
     def __get_city_name(self, byte_stream):
         city_char = super()._recv_byte(byte_stream)
@@ -52,16 +55,18 @@ class ServerProtocol(Protocol):
         elif message_type == super().STATION_DATA:
             station_data = self.__recv_station_data(byte_stream)
             return DataAction(super().STATION_DATA, station_data)
-        else:
+        elif message_type == super().TRIP_DATA:
             trip_data = self.__recv_trip_data(byte_stream)
             return DataAction(super().TRIP_DATA, trip_data)
+        else:
+            return WeatherFinishedAction()
 
     def add_ack_to_packet(self, packet):
         packet.add_byte(super().ACK)
 
     def recv_weather_data_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
-        if message_type == super().FINISHED:
+        if message_type == super().WEATHER_FINISHED:
             return None
         return self.__recv_weather_data(byte_stream)
 
@@ -70,6 +75,12 @@ class ServerProtocol(Protocol):
         if message_type == super().FINISHED:
             return None
         return self.__recv_station_data(byte_stream)
+
+    def recv_trip_data_or_finished(self, byte_stream):
+        message_type = super()._recv_byte(byte_stream)
+        if message_type == super().FINISHED:
+            return None
+        return self.__recv_trip_data(byte_stream)
 
     def __recv_weather_data(self, byte_stream):
         city = self.__get_city_name(byte_stream)

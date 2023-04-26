@@ -32,10 +32,10 @@ class DataDistributer:
         weather_processor = self.__create_and_run_weather_processor()
         duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
         montreal_processor = self.__create_and_run_montreal_processor()
-        counter = Counter()
         while not finished_bool.get_boolean():
             action = server_communication_handler.recv_data_distributer_action()
-            action.perform_action_(finished_bool, weather_communication_handler, stations_communication_handler, counter)
+            action.perform_action_(finished_bool, weather_communication_handler, stations_communication_handler,
+                                   trips_communication_handler)
         weather_processor.join()
         duplicated_stations_processor.join()
         montreal_processor.join()

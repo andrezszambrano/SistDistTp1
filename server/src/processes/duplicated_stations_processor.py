@@ -16,6 +16,4 @@ class DuplicatedStationsProcessor:
             if station_data is None:
                 break
             self._stations.add((station_data.city_name, station_data.code))
-        logging.debug(f"Stations: {self._stations}")
-        #for station in self._stations:
-         #   logging.debug(f"{station}")
+        #logging.debug(f"Stations: {self._stations}")

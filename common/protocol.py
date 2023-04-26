@@ -14,6 +14,7 @@ class Protocol:
     FINISHED = 'F'
     ASK_ACK = 'A'
     ACK = 'O'
+    WEATHER_FINISHED = 'D'
     FOUR_BYTES = 4
     TWO_BYTES = 2
     ONE_BYTE = 1
@@ -110,3 +111,6 @@ class Protocol:
 
     def add_finished_to_packet(self, packet):
         packet.add_byte(self.FINISHED)
+
+    def add_weather_finished_to_packet(self, packet):
+        packet.add_byte(self.WEATHER_FINISHED)

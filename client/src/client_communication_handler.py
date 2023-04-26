@@ -37,3 +37,9 @@ class ClientCommunicationHandler:
         protocol.add_request_for_ack_to_packet(packet)
         self._socket.send(packet)
         protocol.recv_ack(self._socket)
+
+    def send_weather_finished(self):
+        packet = Packet()
+        protocol = ClientProtocol()
+        protocol.add_weather_finished_to_packet(packet)
+        self._socket.send(packet)
