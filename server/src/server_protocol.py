@@ -108,7 +108,6 @@ class ServerProtocol(Protocol):
     def __recv_trip_data(self, byte_stream):
         city = self.__get_city_name(byte_stream)
         start_date_time = super()._recv_date_time(byte_stream)
-        logging.debug(f"Date: {start_date_time}")
         start_station_code = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
         end_date_time = super()._recv_date_time(byte_stream)
         end_station_code = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)

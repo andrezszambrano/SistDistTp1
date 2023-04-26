@@ -4,6 +4,7 @@ from multiprocessing import Process
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from .duplicated_stations_processor import DuplicatedStationsProcessor
 from .montreal_procesor import MontrealProcessor
+from ..counter import Counter
 from ..mutable_boolean import MutableBoolean
 from ..queues.prod_cons_queue import ProdConsQueue
 from ..queues.publ_subs_queue import PublSubsQueue
@@ -28,9 +29,10 @@ class DataDistributer:
         weather_processor = self.__create_and_run_weather_processor()
         duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
         montreal_processor = self.__create_and_run_montreal_processor()
+        counter = Counter()
         while not finished_bool.get_boolean():
             action = server_communication_handler.recv_data_distributer_action()
-            action.perform_action_(finished_bool, weather_communication_handler, stations_communication_handler)
+            action.perform_action_(finished_bool, weather_communication_handler, stations_communication_handler, counter)
         weather_processor.join()
         duplicated_stations_processor.join()
         montreal_processor.join()

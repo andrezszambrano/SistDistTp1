@@ -29,6 +29,5 @@ class Sender:
                 communication_handler.send_station_data(data[1])
             else:
                 communication_handler.send_trip_data(data[1])
-                break
         communication_handler.send_finished()
         self._socket.shutdown_and_close()
