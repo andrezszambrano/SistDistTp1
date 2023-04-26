@@ -1,6 +1,7 @@
 import logging
 
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
+from ..utils.running_average import RunningAverage
 
 
 class WeatherProcessor:
@@ -24,7 +25,7 @@ class WeatherProcessor:
             if weather_data is None:
                 break
             elif weather_data.prectot > self.MIN_PRECTOT:
-                self._days_that_rained_in_city.add((weather_data.city_name, weather_data.date))
+                self._days_that_rained_in_city.update({(weather_data.city_name, weather_data.date), RunningAverage()})
         #logging.debug(f"Days that rained:{self._days_that_rained_in_city}")
 
     def _recv_trips_data(self):
@@ -36,4 +37,9 @@ class WeatherProcessor:
             self._process_trip(trip_data)
 
     def _process_trip(self, trip_data):
-        logging.debug(f"{trip_data.info()}")
+        if (trip_data.city_name, trip_data.start_date_time.date) in self._days_that_rained_in_city:
+            self._days_that_rained_in_city[(trip_data.city_name, trip_data.start_date_time.date)].recalculate_avg(trip_data.duration)
+            logging.debug(f"It rained")
+        else:
+            logging.debug(f"Not")
+        #logging.debug(f"{trip_data.info()}")

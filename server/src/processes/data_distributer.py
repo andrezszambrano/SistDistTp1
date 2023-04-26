@@ -4,8 +4,7 @@ from multiprocessing import Process
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from .duplicated_stations_processor import DuplicatedStationsProcessor
 from .montreal_procesor import MontrealProcessor
-from ..counter import Counter
-from ..mutable_boolean import MutableBoolean
+from ..utils.mutable_boolean import MutableBoolean
 from ..queues.prod_cons_queue import ProdConsQueue
 from ..queues.publ_subs_queue import PublSubsQueue
 from .weather_processor import WeatherProcessor
