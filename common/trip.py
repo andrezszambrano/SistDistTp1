@@ -13,5 +13,5 @@ class Trip:
         self.yearid = yearid
 
     def info(self):
-        return f"{self.city_name}: {self.start_date_time}, {self.start_station_code}, {self.end_date_time}, " \
+        return f"{self.city_name}: SD{self.start_date_time}, {self.start_station_code}, {self.end_date_time}, " \
                f"{self.end_station_code}, {self.duration_sec}, {self.is_member}, {self.yearid}"

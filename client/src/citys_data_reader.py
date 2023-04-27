@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .chunk_file_reader import ChunkFileReader
 from .sender import FINISHED, WEATHER_DATA, STATION_DATA, TRIP_DATA, WEATHER_FINISHED
@@ -14,7 +14,9 @@ STATIONS = "stations.csv"
 TRIPS = "rainy_trips.csv"
 
 def row_to_weather_obj(row, city_name):
-    return Weather(city_name, datetime.strptime(row[0], '%Y-%m-%d').date(), float(row[1]), float(row[2]), float(row[3]),
+    date = datetime.strptime(row[0], '%Y-%m-%d').date()
+    actual_date = date - timedelta(days=1)
+    return Weather(city_name, actual_date, float(row[1]), float(row[2]), float(row[3]),
                    float(row[4]), float(row[5]), float(row[6]), float(row[7]), float(row[8]), float(row[9]),
                    float(row[10]), float(row[11]), float(row[12]), float(row[13]), float(row[14]),
                    float(row[15]), float(row[16]), float(row[17]), float(row[18]), float(row[19]))
@@ -30,6 +32,7 @@ def row_to_trip_obj(row, city_name):
     duration = int(round(float(row[4])))
     if duration < 0:
         duration = 0
+
     return Trip(city_name, datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S'), int(row[1]),
                 datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S'), int(row[3]), duration,
                 int(row[5]) == IS_MEMBER, int(row[6]))
