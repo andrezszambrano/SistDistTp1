@@ -9,15 +9,15 @@ class WeatherProcessor:
 
     def __init__(self, data_queue, trips_queue_n_id_tuple):
         self._data_queue = data_queue
-        self._days_that_rained_in_city = {}
+        self._days_that_rained_in_city = set()
         self._trips_queue = trips_queue_n_id_tuple[0]
         self._trips_queue_id = trips_queue_n_id_tuple[1]
+        self._running_avg = RunningAverage()
 
     def run(self):
         self._recv_weather_data()
         self._recv_trips_data()
-        for city_n_date in self._days_that_rained_in_city:
-            logging.debug(f"{city_n_date}: {self._days_that_rained_in_city[city_n_date].get_avg()}")
+        logging.debug(f"Average duration in rainy days: {self._running_avg.get_avg()}")
 
     def _recv_weather_data(self):
         weather_communication_handler = QueueCommunicationHandler(self._data_queue)
@@ -26,8 +26,7 @@ class WeatherProcessor:
             if weather_data is None:
                 break
             elif weather_data.prectot > self.MIN_PRECTOT:
-                self._days_that_rained_in_city.update({(weather_data.city_name, weather_data.date): RunningAverage()})
-        #logging.debug(f"Days that rained:{self._days_that_rained_in_city}")
+                self._days_that_rained_in_city.add((weather_data.city_name, weather_data.date))
 
     def _recv_trips_data(self):
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
@@ -38,8 +37,6 @@ class WeatherProcessor:
             self._process_trip(trip_data)
 
     def _process_trip(self, trip_data):
-        key = (trip_data.city_name, trip_data.start_date_time.date())
-        logging.debug(f"{key}")
-        if key in self._days_that_rained_in_city:
-            self._days_that_rained_in_city[key].recalculate_avg(trip_data.duration_sec)
-        #logging.debug(f"{trip_data.info()}")
+        pair = (trip_data.city_name, trip_data.start_date_time.date())
+        if pair in self._days_that_rained_in_city:
+            self._running_avg.recalculate_avg(trip_data.duration_sec)
