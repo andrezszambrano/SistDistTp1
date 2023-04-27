@@ -11,7 +11,7 @@ DATA_PATH = "data/"
 FIVE_MB = 5 * 1024 * 1024  # 5 MB
 WEATHER = "weather.csv"
 STATIONS = "stations.csv"
-TRIPS = "trips.csv"
+TRIPS = "rainy_trips.csv"
 
 def row_to_weather_obj(row, city_name):
     return Weather(city_name, datetime.strptime(row[0], '%Y-%m-%d').date(), float(row[1]), float(row[2]), float(row[3]),

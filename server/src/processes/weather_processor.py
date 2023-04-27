@@ -38,6 +38,8 @@ class WeatherProcessor:
             self._process_trip(trip_data)
 
     def _process_trip(self, trip_data):
-        if (trip_data.city_name, trip_data.start_date_time.date) in self._days_that_rained_in_city:
-            self._days_that_rained_in_city[(trip_data.city_name, trip_data.start_date_time.date)].recalculate_avg(trip_data.duration)
+        key = (trip_data.city_name, trip_data.start_date_time.date())
+        logging.debug(f"{key}")
+        if key in self._days_that_rained_in_city:
+            self._days_that_rained_in_city[key].recalculate_avg(trip_data.duration_sec)
         #logging.debug(f"{trip_data.info()}")
