@@ -17,18 +17,10 @@ class WeatherProcessor:
     def run(self):
         self._recv_weather_data()
         self._recv_trips_data()
-        final_dict = {}
-        for city_n_date in self._days_that_rained_in_city:
-            average = self._days_that_rained_in_city[city_n_date]
-            date = city_n_date[1]
-            #logging.debug(f"{city_n_date[1]} {self._days_that_rained_in_city[city_n_date]}")
-            if date in final_dict:
-                previous_average = final_dict[date]
-                final_dict[date] = RunningAverage.join_running_averages(average, previous_average)
-            else:
-                final_dict.update({date: average})
+        final_dict = self._obtain_date_n_average_dict()
         for date in final_dict:
-            logging.debug(f"{date}: {final_dict[date].get_avg()}")
+            if final_dict[date].get_avg() > 0:
+                logging.debug(f"{date}: {final_dict[date].get_avg()}")
 
     def _recv_weather_data(self):
         weather_communication_handler = QueueCommunicationHandler(self._data_queue)
@@ -52,5 +44,17 @@ class WeatherProcessor:
         key = (trip_data.city_name, trip_data.start_date_time.date())
         #logging.debug(f"{key}")
         if key in self._days_that_rained_in_city:
-            logging.debug(f"{trip_data.info()}")
+            #logging.debug(f"{trip_data.info()}")
             self._days_that_rained_in_city[key].recalculate_avg(trip_data.duration_sec)
+
+    def _obtain_date_n_average_dict(self):
+        date_n_average = {}
+        for city_n_date in self._days_that_rained_in_city:
+            average = self._days_that_rained_in_city[city_n_date]
+            date = city_n_date[1]
+            if date in date_n_average:
+                previous_average = date_n_average[date]
+                date_n_average[date] = RunningAverage.join_running_averages(average, previous_average)
+            else:
+                date_n_average.update({date: average})
+        return date_n_average
