@@ -34,11 +34,14 @@ class WeatherProcessor:
 
     def _recv_trips_data(self):
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
+        counter = 0
         while True:
             trip_data = trip_communication_handler.recv_trip_data()
             if trip_data is None:
                 break
             self._process_trip(trip_data)
+            counter = counter + 1
+            logging.debug(f"{counter}")
 
     def _process_trip(self, trip_data):
         key = (trip_data.city_name, trip_data.start_date_time.date())

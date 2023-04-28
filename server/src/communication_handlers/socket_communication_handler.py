@@ -1,3 +1,5 @@
+import logging
+
 from ..packet import Packet
 from .communication_handler import CommunicationHandler
 from ..server_protocol import ServerProtocol

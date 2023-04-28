@@ -12,17 +12,17 @@ class ClientCommunicationHandler:
         packet = Packet()
         protocol = ClientProtocol()
         protocol.add_stations_chunk_to_packet(packet, stations_list)
-        protocol.add_request_for_ack_to_packet(packet)
+        #protocol.add_request_for_ack_to_packet(packet)
         self._socket.send(packet)
-        protocol.recv_ack(self._socket)
+        #protocol.recv_ack(self._socket)
 
     def send_weather_data(self, weathers_list):
         packet = Packet()
         protocol = ClientProtocol()
         protocol.add_weather_chunk_to_packet(packet, weathers_list)
-        protocol.add_request_for_ack_to_packet(packet)
+        #protocol.add_request_for_ack_to_packet(packet)
         self._socket.send(packet)
-        protocol.recv_ack(self._socket)
+        #protocol.recv_ack(self._socket)
 
     def send_finished(self):
         protocol = ClientProtocol()

@@ -1,3 +1,4 @@
+import logging
 import socket
 
 from .byte_stream import ByteStream
