@@ -5,6 +5,7 @@ from .acceptor_socket import AcceptorSocket
 from .communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from .communication_handlers.socket_communication_handler import SocketCommunicationHandler
 from .processes.data_distributer import DataDistributer
+from .processes.query_processor import QueryProcessor
 from .processes.result_processor import ResultProcessor
 from .utils.mutable_boolean import MutableBoolean
 from .queues.prod_cons_queue import ProdConsQueue
@@ -14,10 +15,12 @@ class Server:
     def __init__(self, port, listen_backlog):
         # Initialize server socket
         self._client_sock = None
+        self._port = port
         self._acceptor_socket = AcceptorSocket('', port, listen_backlog)
         self._client_processes = []
         self._prod_cons_queue = ProdConsQueue()
         self._results_queue = ProdConsQueue()
+        self._query_queue = ProdConsQueue()
 
     def run(self):
         socket = self._acceptor_socket.accept()
@@ -25,12 +28,14 @@ class Server:
         distributor_communicator_handler = QueueCommunicationHandler(queue=self._prod_cons_queue)
         finished_bool = MutableBoolean(False)
         data_distributer_process = self.__create_and_run_data_distributer_process()
+        query_processor = self.__create_and_run_query_processor()
         result_processor = self.__create_and_run_results_processor()
         while not finished_bool.get_boolean():
             action = client_communicator_handler.recv_action()
             action.perform_action(finished_bool, client_communicator_handler, distributor_communicator_handler)
         data_distributer_process.join()
         result_processor.join()
+        query_processor.join()
         socket.shutdown_and_close()
         self._acceptor_socket.shutdown_and_close()
         logging.debug(f"finished")
@@ -42,7 +47,13 @@ class Server:
         return data_distributer_process
 
     def __create_and_run_results_processor(self):
-        result_processor = ResultProcessor(self._results_queue)
+        result_processor = ResultProcessor(self._results_queue, self._query_queue)
         result_processor_process = Process(target=result_processor.run, args=(), daemon=False)
         result_processor_process.start()
         return result_processor_process
+
+    def __create_and_run_query_processor(self):
+        query_processor = QueryProcessor(self._port, self._query_queue, self._results_queue)
+        query_processor_process = Process(target=query_processor.run, args=(), daemon=False)
+        query_processor_process.start()
+        return query_processor_process

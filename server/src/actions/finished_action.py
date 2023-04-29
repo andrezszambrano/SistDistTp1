@@ -16,3 +16,7 @@ class FinishedAction(Action):
         weather_communication_handler.send_finished()
         stations_communication_handler.send_finished()
         trips_communication_handler.send_finished()
+
+    def perform_action__(self, finished_bool, query_results, _query_communication_handler):
+        finished_bool.set(True)
+        query_results.set_final_result()

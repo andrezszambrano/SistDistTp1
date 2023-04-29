@@ -8,6 +8,7 @@ from .protocol import Protocol
 from .weather import Weather
 from .station import Station
 from .trip import Trip
+from .query_result import QueryResult
 
 
 class ServerProtocol(Protocol):
@@ -64,6 +65,17 @@ class ServerProtocol(Protocol):
     def add_ack_to_packet(self, packet):
         packet.add_byte(super().ACK)
 
+    def add_query_results_to_packet(self, packet, query_results):
+        self.__add_date_to_avg_dict_to_packet(packet, query_results.date_to_duration_avg)
+        packet.add_boolean(query_results.final_result)
+
+    def __add_date_to_avg_dict_to_packet(self, packet, date_to_avg_dict):
+        for date in date_to_avg_dict:
+            packet.add_byte(super().VALUE)
+            packet.add_date(date)
+            packet.add_float(date_to_avg_dict[date].get_avg())
+        packet.add_byte(super().FINISHED)
+
     def recv_weather_data_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().WEATHER_FINISHED:
@@ -81,6 +93,9 @@ class ServerProtocol(Protocol):
         if message_type == super().FINISHED:
             return None
         return self.__recv_trip_data(byte_stream)
+
+    def recv_query_ask(self, byte_stream):
+        return super()._recv_byte(byte_stream)
 
     def __recv_weather_data(self, byte_stream):
         city = self.__get_city_name(byte_stream)

@@ -52,6 +52,18 @@ class QueueCommunicationHandler:
         protocol.add_date_n_duration(packet, date, duration_sec)
         self._queue.send(packet)
 
+    def send_query_ask(self):
+        packet = Packet()
+        protocol = ServerProtocol()
+        protocol.add_query_ask_to_packet(packet)
+        self._queue.send(packet)
+
+    def send_query_results(self, query_results):
+        packet = Packet()
+        protocol = ServerProtocol()
+        protocol.add_query_results_to_packet(packet, query_results)
+        self._queue.send(packet)
+
     def recv_data_distributer_action(self):
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
@@ -72,7 +84,12 @@ class QueueCommunicationHandler:
         packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_trip_data_or_finished(packet)
 
-    def recv_date_n_duration_or_finished(self):
+    def recv_results_processor_action(self):
         protocol = FilterProtocol()
         packet = self._queue.get_packet(self._queue_id)
-        return protocol.recv_date_n_duration_or_finished(packet)
+        return protocol.recv_results_processor_action(packet)
+
+    def recv_query_results(self):
+        protocol = ServerProtocol()
+        packet = self._queue.get_packet(self._queue_id)
+        return protocol.recv_query_results(packet)

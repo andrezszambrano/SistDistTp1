@@ -2,9 +2,10 @@ import logging
 
 
 class RunningAverage:
-    def __init__(self, total=0, count=0):
+    def __init__(self, total=0, count=0, avg=None):
         self._total = total
         self._count = count
+        self._avg = avg
 
     @classmethod
     def join_running_averages(cls, r_avg1, r_avg2):
@@ -15,6 +16,8 @@ class RunningAverage:
         self._count = self._count + 1
 
     def get_avg(self):
+        if self._avg is not None:
+            return self._avg
         if self._total == 0:
             return 0
         return self._total / self._count

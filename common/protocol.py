@@ -1,5 +1,9 @@
+import logging
 from datetime import datetime, date
 import struct
+
+from .average import Average
+from .query_result import QueryResult
 
 MONTREAL = "montreal"
 WASHINGTON = "washington"
@@ -14,7 +18,9 @@ class Protocol:
     FINISHED = 'F'
     ASK_ACK = 'A'
     ACK = 'O'
+    ASK_FOR_QUERY = 'Q'
     WEATHER_FINISHED = 'D'
+    VALUE = 'V'
     FOUR_BYTES = 4
     TWO_BYTES = 2
     ONE_BYTE = 1
@@ -51,8 +57,22 @@ class Protocol:
         if aux == self.NO_FLOAT:
             return None
         else:
-            float_bytes = byte_stream.read(self.FOUR_BYTES)
-            return struct.unpack('f', float_bytes)[0]
+            return self._recv_float(byte_stream)
+
+    def _recv_float(self, byte_stream):
+        float_bytes = byte_stream.read(self.FOUR_BYTES)
+        return struct.unpack('f', float_bytes)[0]
+
+    def recv_query_results(self, byte_stream):
+        byte = self._recv_byte(byte_stream)
+        date_to_avg_dict = {}
+        while byte != self.FINISHED:
+            date = self._recv_date(byte_stream)
+            duration_avg = self._recv_float(byte_stream)
+            date_to_avg_dict.update({date: Average(duration_avg)})
+            byte = self._recv_byte(byte_stream)
+        final_results = self._recv_boolean(byte_stream)
+        return QueryResult(date_to_avg_dict, final_results)
 
     def _add_float_else_none(self, packet, float_number):
         if float_number is None:
@@ -114,3 +134,6 @@ class Protocol:
 
     def add_weather_finished_to_packet(self, packet):
         packet.add_byte(self.WEATHER_FINISHED)
+
+    def add_query_ask_to_packet(self, packet):
+        packet.add_byte(self.ASK_FOR_QUERY)

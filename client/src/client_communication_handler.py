@@ -43,3 +43,10 @@ class ClientCommunicationHandler:
         protocol = ClientProtocol()
         protocol.add_weather_finished_to_packet(packet)
         self._socket.send(packet)
+
+    def get_query_results(self):
+        packet = Packet()
+        protocol = ClientProtocol()
+        protocol.add_query_ask_to_packet(packet)
+        self._socket.send(packet)
+        return protocol.recv_query_results(self._socket)
