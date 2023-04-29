@@ -1,7 +1,7 @@
 from ..acceptor_socket import AcceptorSocket
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from ..communication_handlers.socket_communication_handler import SocketCommunicationHandler
-from ..utils.mutable_boolean import MutableBoolean
+from ..mutable_boolean import MutableBoolean
 
 
 class QueryProcessor:

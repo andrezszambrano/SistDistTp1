@@ -9,12 +9,12 @@ from ..utils.running_average import RunningAverage
 class WeatherProcessor:
     MIN_PRECTOT = 30
 
-    def __init__(self, data_queue, trips_queue_n_id_tuple, results_queue):
+    def __init__(self, data_queue, trips_queue_n_id_tuple, results_monitor_queue):
         self._data_queue = data_queue
         self._days_that_rained_in_city = set()
         self._trips_queue = trips_queue_n_id_tuple[0]
         self._trips_queue_id = trips_queue_n_id_tuple[1]
-        self._results_queue = results_queue
+        self._results_monitor_queue = results_monitor_queue
 
     def run(self):
         self._recv_weather_data()
@@ -33,7 +33,7 @@ class WeatherProcessor:
 
     def _recv_and_filter_trips_data(self):
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
-        result_communication_handler = QueueCommunicationHandler(self._results_queue)
+        result_communication_handler = QueueCommunicationHandler(self._results_monitor_queue)
         while True:
             trip_data = trip_communication_handler.recv_trip_data()
             if trip_data is None:

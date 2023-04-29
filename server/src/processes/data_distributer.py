@@ -1,11 +1,11 @@
 import logging
 from multiprocessing import Process
 
-from .result_processor import ResultProcessor
+from .result_processor import ResultMonitorProcessor
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from .duplicated_stations_processor import DuplicatedStationsProcessor
 from .montreal_procesor import MontrealProcessor
-from ..utils.mutable_boolean import MutableBoolean
+from ..mutable_boolean import MutableBoolean
 from ..queues.prod_cons_queue import ProdConsQueue
 from ..queues.publ_subs_queue import PublSubsQueue
 from .weather_processor import WeatherProcessor
@@ -16,12 +16,12 @@ class DataDistributer:
     DUPLICATED_STATIONS_QUEUE_ID = 0
     MONTREAL_QUEUE_ID = 1
 
-    def __init__(self, data_queue, results_queue):
+    def __init__(self, data_queue, results_monitor_queue):
         self._data_queue = data_queue
         self._weather_queue = ProdConsQueue()
         self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
         self._trips_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
-        self._results_queue = results_queue
+        self._results_monitor_queue = results_monitor_queue
 
     def run(self):
         finished_bool = MutableBoolean(False)
@@ -42,7 +42,7 @@ class DataDistributer:
         #montreal_processor.join()
 
     def __create_and_run_weather_processor(self):
-        weather_processor = WeatherProcessor(self._weather_queue, (self._trips_queue, 0), self._results_queue)
+        weather_processor = WeatherProcessor(self._weather_queue, (self._trips_queue, 0), self._results_monitor_queue)
         weather_processor_process = Process(target=weather_processor.run, args=(), daemon=False)
         weather_processor_process.start()
         return weather_processor_process
