@@ -8,7 +8,7 @@ from .socket_wrapper import Socket
 class QueryAsker:
     MAX_ATTEMPTS = 5
     DELAY_BETWEEN_ATTEMPTS = 3
-    WAIT = 5
+    WAIT = 20
 
     def __init__(self, server_address):
         self._host, _port = server_address.split(':')

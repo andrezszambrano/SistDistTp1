@@ -20,6 +20,6 @@ class QueryResult:
         else:
             for date in self.date_to_duration_avg:
                 if self.date_to_duration_avg[date].get_avg() > 0:
-                    to_print_vec.append(f"{date}: {self.date_to_duration_avg[date].get_avg()}")
+                    to_print_vec.append(f"\t{date}: {self.date_to_duration_avg[date].get_avg()}")
         to_print = "\n".join(to_print_vec)
         logging.info(f"{to_print}")
