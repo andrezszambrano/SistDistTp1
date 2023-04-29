@@ -1,5 +1,6 @@
 import logging
 
+from ..filter_protocol import FilterProtocol
 from ..packet import Packet
 from ..server_protocol import ServerProtocol
 
@@ -45,6 +46,12 @@ class QueueCommunicationHandler:
         protocol.add_trip_to_packet(packet, trip_data)
         self._queue.send(packet)
 
+    def send_rainy_trip_duration(self, date, duration_sec):
+        packet = Packet()
+        protocol = FilterProtocol()
+        protocol.add_date_n_duration(packet, date, duration_sec)
+        self._queue.send(packet)
+
     def recv_data_distributer_action(self):
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
@@ -64,3 +71,8 @@ class QueueCommunicationHandler:
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_trip_data_or_finished(packet)
+
+    def recv_date_n_duration_or_finished(self):
+        protocol = FilterProtocol()
+        packet = self._queue.get_packet(self._queue_id)
+        return protocol.recv_date_n_duration_or_finished(packet)

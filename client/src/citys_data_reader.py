@@ -61,6 +61,11 @@ class CityDataReader:
         self._queue.put(FINISHED)
 
     def __send_chunks(self, chunk_generator, data_type, finished_char):
-        for chunk in chunk_generator.get_chunks():
-            self._queue.put((data_type, chunk))
+        if data_type == 'T':
+            for chunk in chunk_generator.get_chunks():
+                self._queue.put((data_type, chunk))
+                break
+        else:
+            for chunk in chunk_generator.get_chunks():
+                self._queue.put((data_type, chunk))
         self._queue.put(finished_char)
