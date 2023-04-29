@@ -34,13 +34,11 @@ class WeatherProcessor:
     def _recv_and_filter_trips_data(self):
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
         result_communication_handler = QueueCommunicationHandler(self._results_queue)
-        counter = Counter("WeatherProcess")
         while True:
             trip_data = trip_communication_handler.recv_trip_data()
             if trip_data is None:
                 break
             self._filter_trip(trip_data, result_communication_handler)
-            counter.increase()
         result_communication_handler.send_finished()
 
     def _filter_trip(self, trip_data, result_communication_handler):
