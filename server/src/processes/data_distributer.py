@@ -16,12 +16,12 @@ class DataDistributer:
     DUPLICATED_STATIONS_QUEUE_ID = 0
     MONTREAL_QUEUE_ID = 1
 
-    def __init__(self, data_queue):
+    def __init__(self, data_queue, results_queue):
         self._data_queue = data_queue
         self._weather_queue = ProdConsQueue()
         self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
         self._trips_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
-        self._results_queue = ProdConsQueue()
+        self._results_queue = results_queue
 
     def run(self):
         finished_bool = MutableBoolean(False)
@@ -31,7 +31,6 @@ class DataDistributer:
         trips_communication_handler = QueueCommunicationHandler(self._trips_queue)
 
         weather_processor = self.__create_and_run_weather_processor()
-        result_processor = self.__create_and_run_results_processor()
         #duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
         #montreal_processor = self.__create_and_run_montreal_processor()
         while not finished_bool.get_boolean():
@@ -39,7 +38,6 @@ class DataDistributer:
             action.perform_action_(finished_bool, weather_communication_handler, stations_communication_handler,
                                    trips_communication_handler)
         weather_processor.join()
-        result_processor.join()
         #duplicated_stations_processor.join()
         #montreal_processor.join()
 
@@ -60,10 +58,3 @@ class DataDistributer:
         montreal_processor_process = Process(target=montreal_processor.run, args=(), daemon=False)
         montreal_processor_process.start()
         return montreal_processor_process
-
-    def __create_and_run_results_processor(self):
-        result_processor = ResultProcessor(self._results_queue)
-        result_processor_process = Process(target=result_processor.run, args=(), daemon=False)
-        result_processor_process.start()
-        return result_processor_process
-
