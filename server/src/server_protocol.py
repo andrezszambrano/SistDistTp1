@@ -71,8 +71,9 @@ class ServerProtocol(Protocol):
     def recv_query_data(self, byte_stream):
         date_to_avg_dict = self.__recv_date_to_avg_dict(byte_stream)
         year_to_station_to_counter = self.__recv_year_to_station_to_counter(byte_stream)
+        station_to_distance_avg = self.__recv_station_to_distance_avg(byte_stream)
         final_results = self._recv_boolean(byte_stream)
-        return QueryData(date_to_avg_dict, year_to_station_to_counter, final_results)
+        return QueryData(date_to_avg_dict, year_to_station_to_counter, station_to_distance_avg, final_results)
 
     def __recv_date_to_avg_dict(self, byte_stream):
         byte = self._recv_byte(byte_stream)
@@ -83,6 +84,17 @@ class ServerProtocol(Protocol):
             date_to_avg_dict.update({date: Average(duration_avg)})
             byte = self._recv_byte(byte_stream)
         return date_to_avg_dict
+
+    def __recv_station_to_distance_avg(self, byte_stream):
+        byte = self._recv_byte(byte_stream)
+        station_to_distance_avg = {}
+        while byte != self.FINISHED:
+            year = self._recv_n_byte_number(byte_stream, super().TWO_BYTES)
+            station_name = self._recv_string(byte_stream)
+            distance_avg = self._recv_float(byte_stream)
+            station_to_distance_avg.update({(year, station_name): Average(distance_avg)})
+            byte = self._recv_byte(byte_stream)
+        return station_to_distance_avg
 
     def __recv_year_to_station_to_counter(self, byte_stream):
         year_to_station_to_counter = {}
@@ -109,11 +121,13 @@ class ServerProtocol(Protocol):
     def add_query_data_to_packet(self, packet, query_data):
         self.__add_date_to_avg_dict_to_packet(packet, query_data.date_to_duration_avg)
         self.__add_year_to_station_to_counter_dict_to_packet(packet, query_data.year_to_station_to_counter)
+        self.__add_station_to_distance_avg_to_packet(packet, query_data.station_to_distance_avg)
         packet.add_boolean(query_data.final_data)
 
     def add_query_results_to_packet(self, packet, query_results):
         self.__add_rainy_date_n_avg_list(packet, query_results.rainy_date_n_avg_list)
         self.__add_station_that_doubled_list(packet, query_results.station_that_doubled_list)
+        self.__add_far_away_station_list(packet, query_results.far_away_station_list)
         packet.add_boolean(query_results.final_result)
 
     def __add_rainy_date_n_avg_list(self, packet, rainy_date_n_avg_list):
@@ -121,6 +135,21 @@ class ServerProtocol(Protocol):
             packet.add_byte(super().VALUE)
             packet.add_date(date_n_avg[0])
             packet.add_float(date_n_avg[1])
+        packet.add_byte(super().FINISHED)
+
+    def __add_far_away_station_list(self, packet, far_away_station_list):
+        for station_n_distance in far_away_station_list:
+            packet.add_byte(super().VALUE)
+            packet.add_string_and_length(station_n_distance[0])
+            packet.add_float(station_n_distance[1])
+        packet.add_byte(super().FINISHED)
+
+    def __add_station_to_distance_avg_to_packet(self, packet, station_to_distance_avg):
+        for station_tuple in station_to_distance_avg:
+            packet.add_byte(super().VALUE)
+            packet.add_n_byte_number(super().TWO_BYTES, station_tuple[0])
+            packet.add_string_and_length(station_tuple[1])
+            packet.add_float(station_to_distance_avg[station_tuple].get_avg())
         packet.add_byte(super().FINISHED)
 
     def __add_station_that_doubled_list(self, packet, station_that_doubled_list):

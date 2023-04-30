@@ -19,6 +19,6 @@ class FinishedAction(Action):
 
     def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler):
         counter.increase()
-        if counter.get() == 2:
+        if counter.get() == 3:
             finished_bool.set(True)
             query_results.set_final_data()

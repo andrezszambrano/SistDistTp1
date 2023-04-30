@@ -52,12 +52,6 @@ class QueueCommunicationHandler:
         protocol.add_trip_to_packet(packet, trip_data)
         self._queue.send(packet)
 
-    def send_rainy_trip_duration(self, date, duration_sec):
-        packet = Packet()
-        protocol = FilterProtocol()
-        protocol.add_date_n_duration(packet, date, duration_sec)
-        self._queue.send(packet)
-
     def send_query_ask(self):
         packet = Packet()
         protocol = ServerProtocol()
@@ -74,6 +68,18 @@ class QueueCommunicationHandler:
         packet = Packet()
         protocol = FilterProtocol()
         protocol.add_year_city_n_station_name_to_packet(packet, year, city_name, station_name)
+        self._queue.send(packet)
+
+    def send_rainy_trip_duration(self, date, duration_sec):
+        packet = Packet()
+        protocol = FilterProtocol()
+        protocol.add_date_n_duration(packet, date, duration_sec)
+        self._queue.send(packet)
+
+    def send_station_distance_occurence(self, year, ending_station_name, distance):
+        packet = Packet()
+        protocol = FilterProtocol()
+        protocol.add_station_name_distance_n_year(packet, year, ending_station_name, distance)
         self._queue.send(packet)
 
     def recv_data_distributer_action(self):

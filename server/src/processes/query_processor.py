@@ -26,9 +26,10 @@ class QueryProcessor:
 
     def __process_query_data(self, query_data):
         rainy_date_n_avg_list = self.__parse_date_to_duration_avg_dict_to_list(query_data.date_to_duration_avg)
-        station_that_doubled_list = self.__parse_year_to_station_to_counter_dict_to_list(query_data.year_to_station_to_counter)
+        station_that_doubled_list = self.__parse_n_filter_year_to_station_to_counter_dict_to_list(query_data.year_to_station_to_counter)
+        far_away_station_list = self.__parse_n_filter_station_to_distance_avg_dict_to_list(query_data.station_to_distance_avg)
         final_result = query_data.final_data
-        return QueryResult(rainy_date_n_avg_list, station_that_doubled_list, final_result)
+        return QueryResult(rainy_date_n_avg_list, station_that_doubled_list, far_away_station_list, final_result)
 
     def __parse_date_to_duration_avg_dict_to_list(self, date_to_duration_avg_dict):
         date_to_duration_avg_list = []
@@ -36,7 +37,7 @@ class QueryProcessor:
             date_to_duration_avg_list.append((date, date_to_duration_avg_dict[date].get_avg()))
         return date_to_duration_avg_list
 
-    def __parse_year_to_station_to_counter_dict_to_list(self, year_to_station_to_counter_dict):
+    def __parse_n_filter_year_to_station_to_counter_dict_to_list(self, year_to_station_to_counter_dict):
         year_to_station_to_counter_list = []
         city_n_station_2016_dict = year_to_station_to_counter_dict[2016]
         city_n_station_2017_dict = year_to_station_to_counter_dict[2017]
@@ -47,3 +48,10 @@ class QueryProcessor:
                 if counter_2017 > 2 * counter_2016:
                     year_to_station_to_counter_list.append((city_n_station[1], counter_2017, counter_2016))
         return year_to_station_to_counter_list
+
+    def __parse_n_filter_station_to_distance_avg_dict_to_list(self, station_to_distance_avg):
+        far_away_station_list = []
+        for station_tuple in station_to_distance_avg:
+            if station_to_distance_avg[station_tuple].get_avg() > 6:
+                far_away_station_list.append((station_tuple[1], station_to_distance_avg[station_tuple].get_avg()))
+        return far_away_station_list

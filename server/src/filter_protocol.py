@@ -1,6 +1,7 @@
 import logging
 
 from .actions.finished_action import FinishedAction
+from .actions.montreal_distance_action import MontrealDistanceAction
 from .actions.query_ask_action import QueryAskAction
 from .actions.rainy_trip_action import RainyTripAction
 from .actions.trip_in_2016_2917_action import Trip2016_17Action
@@ -10,6 +11,7 @@ from .protocol import Protocol
 class FilterProtocol(Protocol):
     DATE_N_DURATION = 'P'
     STATION_OCCURRENCE = 'S'
+    DISTANCE_OCCURRENCE = 'D'
 
     def __init__(self):
         super(FilterProtocol, self).__init__()
@@ -25,6 +27,12 @@ class FilterProtocol(Protocol):
         packet.add_string_and_length(city_name)
         packet.add_string_and_length(station_name)
 
+    def add_station_name_distance_n_year(self, packet, year, station_name, distance):
+        packet.add_byte(self.DISTANCE_OCCURRENCE)
+        packet.add_n_byte_number(super().TWO_BYTES, year)
+        packet.add_string_and_length(station_name)
+        packet.add_float(distance)
+
     def recv_results_processor_action(self, bytestream):
         act = super()._recv_byte(bytestream)
         if act == super().FINISHED:
@@ -38,5 +46,10 @@ class FilterProtocol(Protocol):
             city_name = super()._recv_string(bytestream)
             station_name = super()._recv_string(bytestream)
             return Trip2016_17Action(city_name, year, station_name)
+        elif act == self.DISTANCE_OCCURRENCE:
+            year = super()._recv_n_byte_number(bytestream, super().TWO_BYTES)
+            station_name = super()._recv_string(bytestream)
+            distance = super()._recv_float(bytestream)
+            return MontrealDistanceAction(year, station_name, distance)
         else:
             return QueryAskAction()

@@ -18,6 +18,6 @@ class RunningAverage:
     def get_avg(self):
         if self._avg is not None:
             return self._avg
-        if self._total == 0:
+        if self._count == 0:
             return 0
         return self._total / self._count

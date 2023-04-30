@@ -30,8 +30,9 @@ class ClientProtocol(Protocol):
     def recv_query_results(self, byte_stream):
         rainy_date_n_avg_list = self.__recv_date_n_avg_list(byte_stream)
         station_that_doubled_list = self.__recv_station_that_doubled_list(byte_stream)
+        far_away_station_list = self.__recv_far_away_station_list(byte_stream)
         final_query = super()._recv_boolean(byte_stream)
-        return QueryResult(rainy_date_n_avg_list, station_that_doubled_list, final_query)
+        return QueryResult(rainy_date_n_avg_list, station_that_doubled_list, far_away_station_list, final_query)
 
     def __recv_date_n_avg_list(self, byte_stream):
         byte = self._recv_byte(byte_stream)
@@ -40,6 +41,16 @@ class ClientProtocol(Protocol):
             date = self._recv_date(byte_stream)
             duration_avg = self._recv_float(byte_stream)
             rainy_date_n_avg_list.append((date, duration_avg))
+            byte = self._recv_byte(byte_stream)
+        return rainy_date_n_avg_list
+
+    def __recv_far_away_station_list(self, byte_stream):
+        byte = self._recv_byte(byte_stream)
+        rainy_date_n_avg_list = []
+        while byte != self.FINISHED:
+            station_name = self._recv_string(byte_stream)
+            avg_distance = self._recv_float(byte_stream)
+            rainy_date_n_avg_list.append((station_name, avg_distance))
             byte = self._recv_byte(byte_stream)
         return rainy_date_n_avg_list
 
