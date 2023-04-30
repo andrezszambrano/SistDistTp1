@@ -70,7 +70,6 @@ class Protocol:
         final_results = self._recv_boolean(byte_stream)
         #logging.debug(f"{year_to_station_to_counter}")
         query_res = QueryResult(date_to_avg_dict, year_to_station_to_counter, final_results)
-        query_res.print()
         return query_res
 
     def __recv_year_to_station_to_counter(self, byte_stream):

@@ -7,7 +7,7 @@ class Trip2016_17Action():
         self._year = year
         self._station_name = station_name
 
-    def perform_action__(self, _finished_bool, query_results, _query_communication_handler):
+    def perform_action__(self, _finished_bool, _counter, query_results, _query_communication_handler):
         #logging.debug(f"{query_results.year_to_station_to_counter}")
         city_n_station_dict = query_results.year_to_station_to_counter[self._year]
         key = (self._city, self._station_name)
