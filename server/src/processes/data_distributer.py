@@ -31,14 +31,14 @@ class DataDistributer:
         trips_communication_handler = QueueCommunicationHandler(self._trips_queue)
 
         weather_processor = self.__create_and_run_weather_processor()
-        #duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
+        duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
         #montreal_processor = self.__create_and_run_montreal_processor()
         while not finished_bool.get_boolean():
             action = server_communication_handler.recv_data_distributer_action()
             action.perform_action_(finished_bool, weather_communication_handler, stations_communication_handler,
                                    trips_communication_handler)
         weather_processor.join()
-        #duplicated_stations_processor.join()
+        duplicated_stations_processor.join()
         #montreal_processor.join()
 
     def __create_and_run_weather_processor(self):
@@ -48,7 +48,8 @@ class DataDistributer:
         return weather_processor_process
 
     def __create_and_run_duplicated_stations_processor(self):
-        duplicated_stations_processor = DuplicatedStationsProcessor(self._stations_queue, self.DUPLICATED_STATIONS_QUEUE_ID)
+        duplicated_stations_processor = DuplicatedStationsProcessor((self._stations_queue, self.DUPLICATED_STATIONS_QUEUE_ID),
+                                                                    (self._trips_queue, 1), self._results_monitor_queue)
         duplicated_stations_processor_process = Process(target=duplicated_stations_processor.run, args=(), daemon=False)
         duplicated_stations_processor_process.start()
         return duplicated_stations_processor_process

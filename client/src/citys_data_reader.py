@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 
 from .chunk_file_reader import ChunkFileReader
-from .sender import FINISHED, WEATHER_DATA, STATION_DATA, TRIP_DATA, WEATHER_FINISHED
+from .sender import FINISHED, WEATHER_DATA, STATION_DATA, TRIP_DATA, WEATHER_FINISHED, STATION_FINISHED
 from .station import Station
 from .weather import Weather
 from .trip import Trip
@@ -11,7 +11,7 @@ DATA_PATH = "data/"
 KB_250 = 250 * 1024  # 250 Kb
 WEATHER = "weather.csv"
 STATIONS = "stations.csv"
-TRIPS = "rainy_trips.csv"
+TRIPS = "all_2016_2017_trips.csv"
 
 
 def row_to_weather_obj(row, city_name):
@@ -31,13 +31,13 @@ def row_to_station_obj(row, city_name):
 
 def row_to_trip_obj(row, city_name):
     IS_MEMBER = 1
-    duration = int(round(float(row[4])))
+    duration = int(round(float(row[5])))
     if duration < 0:
         duration = 0
 
-    return Trip(city_name, datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S'), int(row[1]),
-                datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S'), int(row[3]), duration,
-                int(row[5]) == IS_MEMBER, int(row[6]))
+    return Trip(city_name, datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S'), int(row[2]),
+                datetime.strptime(row[3], '%Y-%m-%d %H:%M:%S'), int(row[4]), duration,
+                int(row[6]) == IS_MEMBER, int(row[7]))
 
 
 class CityDataReader:
@@ -52,7 +52,7 @@ class CityDataReader:
         logging.info(f"{self._city_name}: Weather data read")
         stations_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{STATIONS}", KB_250,
                                                    row_to_station_obj, self._city_name)
-        self.__send_chunks(stations_chunk_generator, STATION_DATA, 'p')
+        self.__send_chunks(stations_chunk_generator, STATION_DATA, STATION_FINISHED)
         logging.info(f"{self._city_name}: Station data read")
         trips_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{TRIPS}", KB_250,
                                                 row_to_trip_obj, self._city_name)
@@ -61,11 +61,6 @@ class CityDataReader:
         self._queue.put(FINISHED)
 
     def __send_chunks(self, chunk_generator, data_type, finished_char):
-        if data_type == 'T':
-            for chunk in chunk_generator.get_chunks():
-                self._queue.put((data_type, chunk))
-                break
-        else:
-            for chunk in chunk_generator.get_chunks():
-                self._queue.put((data_type, chunk))
+        for chunk in chunk_generator.get_chunks():
+            self._queue.put((data_type, chunk))
         self._queue.put(finished_char)

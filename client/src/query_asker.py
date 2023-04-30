@@ -30,7 +30,6 @@ class QueryAsker:
             try:
                 return Socket(self._host, self._port)
             except ConnectionRefusedError:
-                #print(f"Connection attempt {attempts + 1} failed. Retrying in {DELAY_BETWEEN_ATTEMPTS} seconds...")
                 time.sleep(self.DELAY_BETWEEN_ATTEMPTS)
                 attempts += 1
         time.sleep(self.WAIT)

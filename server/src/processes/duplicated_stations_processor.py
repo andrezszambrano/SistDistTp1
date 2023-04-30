@@ -4,16 +4,40 @@ from ..communication_handlers.queue_communication_handler import QueueCommunicat
 
 
 class DuplicatedStationsProcessor:
-    def __init__(self, data_queue, queue_id):
-        self._data_queue = data_queue
-        self._queue_id = queue_id
-        self._stations = set()
+    def __init__(self, stations_queue_n_id_tuple, trips_queue_n_id_tuple, results_monitor_queue):
+        self._stations_queue = stations_queue_n_id_tuple[0]
+        self._stations_queue_id = stations_queue_n_id_tuple[1]
+        self._trips_queue = trips_queue_n_id_tuple[0]
+        self._trips_queue_id = trips_queue_n_id_tuple[1]
+        self._results_monitor_queue = results_monitor_queue
+        self._stations = {}
 
     def run(self):
-        communication_handler = QueueCommunicationHandler(self._data_queue, self._queue_id)
+        self._recv_station_data()
+
+        self._recv_and_filter_trips_data()
+
+    def _recv_station_data(self):
+        communication_handler = QueueCommunicationHandler(self._stations_queue, self._stations_queue_id)
         while True:
             station_data = communication_handler.recv_station_data()
             if station_data is None:
                 break
-            self._stations.add((station_data.city_name, station_data.code))
-        #logging.debug(f"Stations: {self._stations}")
+            if station_data.yearid in [2016, 2017]:
+                self._stations.update({(station_data.city_name, station_data.yearid, station_data.code): station_data.name})
+
+    def _recv_and_filter_trips_data(self):
+        trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
+        result_communication_handler = QueueCommunicationHandler(self._results_monitor_queue)
+        while True:
+            trip_data = trip_communication_handler.recv_trip_data()
+            if trip_data is None:
+                break
+            self._filter_trip(trip_data, result_communication_handler)
+        result_communication_handler.send_finished()
+
+    def _filter_trip(self, trip_data, result_communication_handler):
+        year =  trip_data.start_date_time.date().year
+        if year in [2016, 2017]:
+            station_key = (trip_data.city_name, year, trip_data.start_station_code)
+            result_communication_handler.send_station_occurrence(year, trip_data.city_name, self._stations[station_key])

@@ -20,7 +20,6 @@ class WeatherProcessor:
         self._recv_weather_data()
         self._recv_and_filter_trips_data()
 
-
     def _recv_weather_data(self):
         weather_communication_handler = QueueCommunicationHandler(self._data_queue)
         while True:
