@@ -2,9 +2,6 @@ import logging
 from datetime import datetime, date
 import struct
 
-from .average import Average
-from .query_result import QueryResult
-
 MONTREAL = "montreal"
 WASHINGTON = "washington"
 TORONTO = "toronto"
@@ -63,43 +60,6 @@ class Protocol:
     def _recv_float(self, byte_stream):
         float_bytes = byte_stream.read(self.FOUR_BYTES)
         return struct.unpack('f', float_bytes)[0]
-
-    def recv_query_results(self, byte_stream):
-        date_to_avg_dict = self.__recv_date_to_avg_dict(byte_stream)
-        year_to_station_to_counter = self.__recv_year_to_station_to_counter(byte_stream)
-        final_results = self._recv_boolean(byte_stream)
-        #logging.debug(f"{year_to_station_to_counter}")
-        query_res = QueryResult(date_to_avg_dict, year_to_station_to_counter, final_results)
-        return query_res
-
-    def __recv_year_to_station_to_counter(self, byte_stream):
-        year_to_station_to_counter = {}
-        stations_2016 = self.__recv_stations_to_counter(byte_stream)
-        year_to_station_to_counter.update({2016: stations_2016})
-        stations_2017 = self.__recv_stations_to_counter(byte_stream)
-        year_to_station_to_counter.update({2017: stations_2017})
-        return year_to_station_to_counter
-
-    def __recv_stations_to_counter(self, byte_stream):
-        byte = self._recv_byte(byte_stream)
-        city_n_stations_to_counter = {}
-        while byte != self.FINISHED:
-            city_name = self._recv_string(byte_stream)
-            station_name = self._recv_string(byte_stream)
-            count = self._recv_n_byte_number(byte_stream, self.FOUR_BYTES)
-            city_n_stations_to_counter.update({(city_name, station_name): count})
-            byte = self._recv_byte(byte_stream)
-        return city_n_stations_to_counter
-
-    def __recv_date_to_avg_dict(self, byte_stream):
-        byte = self._recv_byte(byte_stream)
-        date_to_avg_dict = {}
-        while byte != self.FINISHED:
-            date = self._recv_date(byte_stream)
-            duration_avg = self._recv_float(byte_stream)
-            date_to_avg_dict.update({date: Average(duration_avg)})
-            byte = self._recv_byte(byte_stream)
-        return date_to_avg_dict
 
     def _add_float_else_none(self, packet, float_number):
         if float_number is None:

@@ -21,4 +21,4 @@ class FinishedAction(Action):
         counter.increase()
         if counter.get() == 2:
             finished_bool.set(True)
-            query_results.set_final_result()
+            query_results.set_final_data()

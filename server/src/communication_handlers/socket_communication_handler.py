@@ -1,14 +1,12 @@
 import logging
 
 from ..packet import Packet
-from .communication_handler import CommunicationHandler
 from ..server_protocol import ServerProtocol
 
 
-class SocketCommunicationHandler(CommunicationHandler):
+class SocketCommunicationHandler:
 
     def __init__(self, socket):
-        super(SocketCommunicationHandler).__init__()
         self._socket = socket
 
     def send_ack(self):

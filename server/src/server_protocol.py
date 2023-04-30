@@ -6,9 +6,11 @@ from .actions.finished_action import FinishedAction
 from .actions.station_finished_action import StationFinishedAction
 from .actions.weather_finished_action import WeatherFinishedAction
 from .protocol import Protocol
+from .query_data import QueryData
 from .weather import Weather
 from .station import Station
 from .trip import Trip
+from .average import Average
 
 
 class ServerProtocol(Protocol):
@@ -66,13 +68,68 @@ class ServerProtocol(Protocol):
         else:
             return StationFinishedAction()
 
+    def recv_query_data(self, byte_stream):
+        date_to_avg_dict = self.__recv_date_to_avg_dict(byte_stream)
+        year_to_station_to_counter = self.__recv_year_to_station_to_counter(byte_stream)
+        final_results = self._recv_boolean(byte_stream)
+        return QueryData(date_to_avg_dict, year_to_station_to_counter, final_results)
+
+    def __recv_date_to_avg_dict(self, byte_stream):
+        byte = self._recv_byte(byte_stream)
+        date_to_avg_dict = {}
+        while byte != self.FINISHED:
+            date = self._recv_date(byte_stream)
+            duration_avg = self._recv_float(byte_stream)
+            date_to_avg_dict.update({date: Average(duration_avg)})
+            byte = self._recv_byte(byte_stream)
+        return date_to_avg_dict
+
+    def __recv_year_to_station_to_counter(self, byte_stream):
+        year_to_station_to_counter = {}
+        stations_2016 = self.__recv_stations_to_counter(byte_stream)
+        year_to_station_to_counter.update({2016: stations_2016})
+        stations_2017 = self.__recv_stations_to_counter(byte_stream)
+        year_to_station_to_counter.update({2017: stations_2017})
+        return year_to_station_to_counter
+
+    def __recv_stations_to_counter(self, byte_stream):
+        byte = self._recv_byte(byte_stream)
+        city_n_stations_to_counter = {}
+        while byte != self.FINISHED:
+            city_name = self._recv_string(byte_stream)
+            station_name = self._recv_string(byte_stream)
+            count = self._recv_n_byte_number(byte_stream, self.FOUR_BYTES)
+            city_n_stations_to_counter.update({(city_name, station_name): count})
+            byte = self._recv_byte(byte_stream)
+        return city_n_stations_to_counter
+
     def add_ack_to_packet(self, packet):
         packet.add_byte(super().ACK)
 
+    def add_query_data_to_packet(self, packet, query_data):
+        self.__add_date_to_avg_dict_to_packet(packet, query_data.date_to_duration_avg)
+        self.__add_year_to_station_to_counter_dict_to_packet(packet, query_data.year_to_station_to_counter)
+        packet.add_boolean(query_data.final_data)
+
     def add_query_results_to_packet(self, packet, query_results):
-        self.__add_date_to_avg_dict_to_packet(packet, query_results.date_to_duration_avg)
-        self.__add_year_to_station_to_counter_dict_to_packet(packet, query_results.year_to_station_to_counter)
+        self.__add_rainy_date_n_avg_list(packet, query_results.rainy_date_n_avg_list)
+        self.__add_station_that_doubled_list(packet, query_results.station_that_doubled_list)
         packet.add_boolean(query_results.final_result)
+
+    def __add_rainy_date_n_avg_list(self, packet, rainy_date_n_avg_list):
+        for date_n_avg in rainy_date_n_avg_list:
+            packet.add_byte(super().VALUE)
+            packet.add_date(date_n_avg[0])
+            packet.add_float(date_n_avg[1])
+        packet.add_byte(super().FINISHED)
+
+    def __add_station_that_doubled_list(self, packet, station_that_doubled_list):
+        for station_tuple in station_that_doubled_list:
+            packet.add_byte(super().VALUE)
+            packet.add_string_and_length(station_tuple[0])
+            packet.add_n_byte_number(super().FOUR_BYTES, station_tuple[1])
+            packet.add_n_byte_number(super().FOUR_BYTES, station_tuple[2])
+        packet.add_byte(super().FINISHED)
 
     def __add_date_to_avg_dict_to_packet(self, packet, date_to_avg_dict):
         for date in date_to_avg_dict:

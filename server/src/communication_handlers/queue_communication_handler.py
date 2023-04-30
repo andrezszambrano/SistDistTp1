@@ -64,10 +64,10 @@ class QueueCommunicationHandler:
         protocol.add_query_ask_to_packet(packet)
         self._queue.send(packet)
 
-    def send_query_results(self, query_results):
+    def send_query_data(self, query_data):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_query_results_to_packet(packet, query_results)
+        protocol.add_query_data_to_packet(packet, query_data)
         self._queue.send(packet)
 
     def send_station_occurrence(self, year, city_name, station_name):
@@ -101,7 +101,7 @@ class QueueCommunicationHandler:
         packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_results_processor_action(packet)
 
-    def recv_query_results(self):
+    def recv_query_data(self):
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
-        return protocol.recv_query_results(packet)
+        return protocol.recv_query_data(packet)
