@@ -149,8 +149,8 @@ class ServerProtocol(Protocol):
     def __add_station_to_distance_avg_to_packet(self, packet, station_to_distance_avg):
         for station_tuple in station_to_distance_avg:
             packet.add_byte(super().VALUE)
-            packet.add_n_byte_number(super().TWO_BYTES, station_tuple[0])
-            packet.add_string_and_length(station_tuple[1])
+            packet.add_n_byte_number(super().TWO_BYTES, station_tuple[1])
+            packet.add_string_and_length(station_tuple[0])
             packet.add_float(station_to_distance_avg[station_tuple].get_avg())
         packet.add_byte(super().FINISHED)
 
@@ -181,8 +181,8 @@ class ServerProtocol(Protocol):
         city_n_station_to_counter = year_to_station_to_counter[year]
         for city_n_station in city_n_station_to_counter:
             packet.add_byte(super().VALUE)
-            packet.add_string_and_length(city_n_station[0])
             packet.add_string_and_length(city_n_station[1])
+            packet.add_string_and_length(city_n_station[0])
             packet.add_n_byte_number(super().FOUR_BYTES, city_n_station_to_counter[city_n_station])
 
     def recv_weather_batch_or_finished(self, byte_stream):

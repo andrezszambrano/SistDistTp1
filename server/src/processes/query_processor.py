@@ -33,16 +33,15 @@ class QueryProcessor:
 
     def __parse_date_to_duration_avg_dict_to_list(self, date_to_duration_avg_dict):
         date_to_duration_avg_list = []
-        for date in date_to_duration_avg_dict:
-            date_to_duration_avg_list.append((date, date_to_duration_avg_dict[date].get_avg()))
+        for date, avg in iter(sorted(date_to_duration_avg_dict.items())):
+            date_to_duration_avg_list.append((date, avg.get_avg()))
         return date_to_duration_avg_list
 
     def __parse_n_filter_year_to_station_to_counter_dict_to_list(self, year_to_station_to_counter_dict):
         year_to_station_to_counter_list = []
         city_n_station_2016_dict = year_to_station_to_counter_dict[2016]
         city_n_station_2017_dict = year_to_station_to_counter_dict[2017]
-        for city_n_station in city_n_station_2016_dict:
-            counter_2016 = city_n_station_2016_dict[city_n_station]
+        for city_n_station, counter_2016 in iter(sorted(city_n_station_2016_dict.items())):
             if city_n_station in city_n_station_2017_dict:
                 counter_2017 = city_n_station_2017_dict[city_n_station]
                 if counter_2017 > 2 * counter_2016:
@@ -51,7 +50,7 @@ class QueryProcessor:
 
     def __parse_n_filter_station_to_distance_avg_dict_to_list(self, station_to_distance_avg):
         far_away_station_list = []
-        for station_tuple in station_to_distance_avg:
-            if station_to_distance_avg[station_tuple].get_avg() > 6:
-                far_away_station_list.append((station_tuple[1], station_to_distance_avg[station_tuple].get_avg()))
+        for station_tuple, avg in iter(sorted(station_to_distance_avg.items())):
+            if avg.get_avg() > 6:
+                far_away_station_list.append((station_tuple[1], avg.get_avg()))
         return far_away_station_list

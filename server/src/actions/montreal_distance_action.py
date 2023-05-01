@@ -10,7 +10,7 @@ class MontrealDistanceAction:
             year = station_distance_occurrence[0]
             station_name = station_distance_occurrence[1]
             distance = station_distance_occurrence[2]
-            station_key = (year, station_name)
+            station_key = (station_name, year)
             station_to_distance_avg_dict = query_data.station_to_distance_avg
             if station_key in station_to_distance_avg_dict:
                 station_to_distance_avg_dict[station_key].recalculate_avg(distance)

@@ -12,7 +12,7 @@ class Trip2016_17Action():
             city = station_occurrence[1]
             station_name = station_occurrence[2]
             city_n_station_dict = query_data.year_to_station_to_counter[year]
-            key = (city, station_name)
+            key = (station_name, city)
             if key in city_n_station_dict:
                 city_n_station_dict[key] = city_n_station_dict[key] + 1
             else:
