@@ -25,8 +25,8 @@ class ServerProtocol(Protocol):
         elif message_type == super().ASK_ACK:
             return AckAction()
         if message_type == super().WEATHER_DATA:
-            weather_data = self.__recv_weather_data(byte_stream)
-            return DataAction(super().WEATHER_DATA, weather_data)
+            weather_batch = self.__recv_weather_batch(byte_stream)
+            return DataAction(super().WEATHER_DATA, weather_batch)
         elif message_type == super().STATION_DATA:
             station_data = self.__recv_station_data(byte_stream)
             return DataAction(super().STATION_DATA, station_data)
@@ -44,7 +44,8 @@ class ServerProtocol(Protocol):
 
     def add_data_to_packet(self, packet, data_type, data):
         if data_type == super().WEATHER_DATA:
-            self.add_weather_to_packet(packet, data)
+            #logging.debug(f"Sending batch to dist {data}")
+            self.add_weather_batch_to_packet(packet, data)
         elif data_type == super().STATION_DATA:
             self.add_station_to_packet(packet, data)
         else:
@@ -55,8 +56,8 @@ class ServerProtocol(Protocol):
         if message_type == super().FINISHED:
             return FinishedAction()
         if message_type == super().WEATHER_DATA:
-            weather_data = self.__recv_weather_data(byte_stream)
-            return DataAction(super().WEATHER_DATA, weather_data)
+            weather_batch = self.__recv_weather_batch(byte_stream)
+            return DataAction(super().WEATHER_DATA, weather_batch)
         elif message_type == super().STATION_DATA:
             station_data = self.__recv_station_data(byte_stream)
             return DataAction(super().STATION_DATA, station_data)
@@ -183,11 +184,12 @@ class ServerProtocol(Protocol):
             packet.add_string_and_length(city_n_station[1])
             packet.add_n_byte_number(super().FOUR_BYTES, city_n_station_to_counter[city_n_station])
 
-    def recv_weather_data_or_finished(self, byte_stream):
+    def recv_weather_batch_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().WEATHER_FINISHED:
             return None
-        return self.__recv_weather_data(byte_stream)
+        we = self.__recv_weather_batch(byte_stream)
+        return we
 
     def recv_station_data_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
@@ -204,8 +206,7 @@ class ServerProtocol(Protocol):
     def recv_query_ask(self, byte_stream):
         return super()._recv_byte(byte_stream)
 
-    def __recv_weather_data(self, byte_stream):
-        city = self.__get_city_name(byte_stream)
+    def __recv_weather_data(self, byte_stream, city):
         date = super()._recv_date(byte_stream)
         prectot = super()._recv_float_else_none(byte_stream)
         qv2m = super()._recv_float_else_none(byte_stream)
@@ -228,6 +229,17 @@ class ServerProtocol(Protocol):
         ws10m = super()._recv_float_else_none(byte_stream)
         return Weather(city, date, prectot, qv2m, rh2m, ps, t2m_range, ts, t2mdew, t2mwet, t2m_max, t2m_min, t2m, ws50m_range,
                        ws10m_range, ws50m_min, ws10m_min, ws50m_max, ws10m_max, ws50m, ws10m)
+
+    def __recv_weather_batch(self, byte_stream):
+        city = self.__get_city_name(byte_stream)
+        weather_batch = []
+        byte = super()._recv_byte(byte_stream)
+        while byte != self.FINISHED:
+            weather = self.__recv_weather_data(byte_stream, city)
+            #logging.debug(f"{weather}")
+            weather_batch.append(weather)
+            byte = self._recv_byte(byte_stream)
+        return weather_batch
 
     def __recv_station_data(self, byte_stream):
         city = self.__get_city_name(byte_stream)

@@ -77,9 +77,8 @@ class Protocol:
         self._add_float_else_none(packet, station.longitude)
         packet.add_n_byte_number(self.TWO_BYTES, station.yearid)
 
-    def add_weather_to_packet(self, packet, weather, throw_unnecessary_data=False):
-        packet.add_byte(self.WEATHER_DATA)
-        packet.add_byte(self._city_name_to_char[weather.city_name])
+    def _add_weather_to_packet(self, packet, weather, throw_unnecessary_data=False):
+        #packet.add_byte(self._city_name_to_char[weather.city_name])
         packet.add_date(weather.date)
         self._add_float_else_none(packet, weather.prectot)
         if throw_unnecessary_data:
@@ -104,6 +103,14 @@ class Protocol:
         self._add_float_else_none(packet, weather.ws10m_max)
         self._add_float_else_none(packet, weather.ws50m)
         self._add_float_else_none(packet, weather.ws10m)
+
+    def add_weather_batch_to_packet(self, packet, weather_list, throw_unnecessary_data=False):
+        packet.add_byte(self.WEATHER_DATA)
+        packet.add_byte(self._city_name_to_char[weather_list[0].city_name])
+        for weather in weather_list:
+            packet.add_byte(self.VALUE)
+            self._add_weather_to_packet(packet, weather, throw_unnecessary_data)
+        packet.add_byte(self.FINISHED)
 
     def add_trip_to_packet(self, packet, trip):
         packet.add_byte(self.TRIP_DATA)

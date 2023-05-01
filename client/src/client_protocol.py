@@ -13,10 +13,6 @@ class ClientProtocol(Protocol):
         for station in stations_list:
             super().add_station_to_packet(packet, station)
 
-    def add_weather_chunk_to_packet(self, packet, weather_list):
-        for weather in weather_list:
-            super().add_weather_to_packet(packet, weather)
-
     def add_trip_chunk_to_packet(self, packet, trips_list):
         for trip in trips_list:
             super().add_trip_to_packet(packet, trip)

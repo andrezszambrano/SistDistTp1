@@ -3,6 +3,7 @@ import logging
 
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from ..counter import Counter
+from ..printing_counter import PrintingCounter
 from ..utils.running_average import RunningAverage
 
 
@@ -22,12 +23,16 @@ class WeatherProcessor:
 
     def _recv_weather_data(self):
         weather_communication_handler = QueueCommunicationHandler(self._data_queue)
+        printing_counter = PrintingCounter("Weather", 1000)
         while True:
-            weather_data = weather_communication_handler.recv_weather_data()
-            if weather_data is None:
+            weather_batch = weather_communication_handler.recv_weather_batch()
+            if weather_batch is None:
                 break
-            elif weather_data.prectot > self.MIN_PRECTOT:
-                self._days_that_rained_in_city.add((weather_data.city_name, weather_data.date))
+            for weather in weather_batch:
+                if weather.prectot > self.MIN_PRECTOT:
+                    self._days_that_rained_in_city.add((weather.city_name, weather.date))
+                printing_counter.increase()
+        printing_counter.print_final()
         #logging.debug(f"Days that rained:{self._days_that_rained_in_city}")
 
     def _recv_and_filter_trips_data(self):

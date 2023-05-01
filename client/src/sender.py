@@ -36,7 +36,7 @@ class Sender:
                 if station_finished_counter == 3:
                     communication_handler.send_station_finished()
             elif data[0] == WEATHER_DATA:
-                communication_handler.send_weather_data(data[1])
+                communication_handler.send_weather_batch(data[1])
             elif data[0] == STATION_DATA:
                 communication_handler.send_station_data(data[1])
             elif data[0] == TRIP_DATA:

@@ -34,10 +34,10 @@ class QueueCommunicationHandler:
         protocol.add_station_finished_to_packet(packet)
         self._queue.send(packet)
 
-    def send_data_to_weather_process(self, weather_data):
+    def send_batch_to_weather_process(self, weather_data):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_weather_to_packet(packet, weather_data, throw_unnecessary_data=True)
+        protocol.add_weather_batch_to_packet(packet, weather_data, throw_unnecessary_data=True)
         self._queue.send(packet)
 
     def send_data_to_station_processes(self, station_data):
@@ -87,10 +87,10 @@ class QueueCommunicationHandler:
         packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_data_distributer_action(packet)
 
-    def recv_weather_data(self):
+    def recv_weather_batch(self):
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
-        return protocol.recv_weather_data_or_finished(packet)
+        return protocol.recv_weather_batch_or_finished(packet)
 
     def recv_station_data(self):
         protocol = ServerProtocol()

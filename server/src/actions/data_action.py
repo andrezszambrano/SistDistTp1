@@ -19,7 +19,7 @@ class DataAction(Action):
                         trips_communication_handler):
         #logging.debug(f"{self}: {self._data_type}")
         if self._data_type == Protocol().WEATHER_DATA:
-            weather_communication_handler.send_data_to_weather_process(self._data)
+            weather_communication_handler.send_batch_to_weather_process(self._data)
         elif self._data_type == Protocol().STATION_DATA:
             stations_communication_handler.send_data_to_station_processes(self._data)
         else:
