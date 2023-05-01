@@ -70,10 +70,10 @@ class QueueCommunicationHandler:
         protocol.add_year_city_n_station_name_to_packet(packet, year, city_name, station_name)
         self._queue.send(packet)
 
-    def send_rainy_trip_duration(self, date, duration_sec):
+    def send_rainy_trip_duration_batch(self, rainy_trips_duration_batch):
         packet = Packet()
         protocol = FilterProtocol()
-        protocol.add_date_n_duration(packet, date, duration_sec)
+        protocol.add_rainy_trip_duration_batch(packet, rainy_trips_duration_batch)
         self._queue.send(packet)
 
     def send_station_distance_occurence(self, year, ending_station_name, distance):

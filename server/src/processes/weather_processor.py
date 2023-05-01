@@ -47,7 +47,10 @@ class WeatherProcessor:
 
     def _filter_trip_batch(self, trip_batch, result_communication_handler):
         #logging.debug(f"{key}")
+        rainy_trips_duration_batch = []
         for trip in trip_batch:
             date =  trip.start_date_time.date()
             if (trip.city_name, date) in self._days_that_rained_in_city:
-                result_communication_handler.send_rainy_trip_duration(date, trip.duration_sec)
+                rainy_trips_duration_batch.append((date, trip.duration_sec))
+        if len(rainy_trips_duration_batch) > 0:
+            result_communication_handler.send_rainy_trip_duration_batch(rainy_trips_duration_batch)
