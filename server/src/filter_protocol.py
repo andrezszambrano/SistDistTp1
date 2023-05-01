@@ -27,8 +27,15 @@ class FilterProtocol(Protocol):
             self.__add_date_n_duration(packet, rainy_trip_n_duration[0], rainy_trip_n_duration[1])
         packet.add_byte(self.FINISHED)
 
-    def add_year_city_n_station_name_to_packet(self, packet, year, city_name, station_name):
+    def add_station_occurrence_batch(self, packet, station_occurrence_batch):
         packet.add_byte(self.STATION_OCCURRENCE)
+        for station_occurrence in station_occurrence_batch:
+            packet.add_byte(self.VALUE)
+            self.__add_year_city_n_station_name_to_packet(packet, station_occurrence[0], station_occurrence[1],
+                                                          station_occurrence[2])
+        packet.add_byte(self.FINISHED)
+
+    def __add_year_city_n_station_name_to_packet(self, packet, year, city_name, station_name):
         packet.add_n_byte_number(super().TWO_BYTES, year)
         packet.add_string_and_length(city_name)
         packet.add_string_and_length(station_name)
@@ -49,6 +56,17 @@ class FilterProtocol(Protocol):
             byte = self._recv_byte(byte_stream)
         return rainy_trip_duration_batch
 
+    def __recv_station_occurrence_batch(self, byte_stream):
+        station_occurrence_batch = []
+        byte = super()._recv_byte(byte_stream)
+        while byte != self.FINISHED:
+            year = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
+            city_name = super()._recv_string(byte_stream)
+            station_name = super()._recv_string(byte_stream)
+            station_occurrence_batch.append((year, city_name, station_name))
+            byte = self._recv_byte(byte_stream)
+        return station_occurrence_batch
+
     def recv_results_processor_action(self, byte_stream):
         act = super()._recv_byte(byte_stream)
         if act == super().FINISHED:
@@ -57,10 +75,8 @@ class FilterProtocol(Protocol):
             rainy_trip_duration_batch = self.__recv_rainy_trip_duration_batch(byte_stream)
             return RainyTripAction(rainy_trip_duration_batch)
         elif act == self.STATION_OCCURRENCE:
-            year = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
-            city_name = super()._recv_string(byte_stream)
-            station_name = super()._recv_string(byte_stream)
-            return Trip2016_17Action(city_name, year, station_name)
+            station_occurrence_batch = self.__recv_station_occurrence_batch(byte_stream)
+            return Trip2016_17Action(station_occurrence_batch)
         elif act == self.DISTANCE_OCCURRENCE:
             year = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
             station_name = super()._recv_string(byte_stream)

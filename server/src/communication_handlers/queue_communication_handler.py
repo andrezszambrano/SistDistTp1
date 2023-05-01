@@ -64,10 +64,10 @@ class QueueCommunicationHandler:
         protocol.add_query_data_to_packet(packet, query_data)
         self._queue.send(packet)
 
-    def send_station_occurrence(self, year, city_name, station_name):
+    def send_station_occurrence_batch(self, trips_in_2016_or_2017):
         packet = Packet()
         protocol = FilterProtocol()
-        protocol.add_year_city_n_station_name_to_packet(packet, year, city_name, station_name)
+        protocol.add_station_occurrence_batch(packet, trips_in_2016_or_2017)
         self._queue.send(packet)
 
     def send_rainy_trip_duration_batch(self, rainy_trips_duration_batch):

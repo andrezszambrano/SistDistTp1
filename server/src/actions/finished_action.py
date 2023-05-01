@@ -17,7 +17,7 @@ class FinishedAction(Action):
         stations_communication_handler.send_finished()
         trips_communication_handler.send_finished()
 
-    def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler):
+    def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler, _printing_counter):
         counter.increase()
         if counter.get() == 3:
             finished_bool.set(True)

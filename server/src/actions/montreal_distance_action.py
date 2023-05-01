@@ -7,7 +7,7 @@ class MontrealDistanceAction:
         self._station_name = station_name
         self._distance = distance
 
-    def perform_action__(self, _finished_bool, _counter, query_data, _query_communication_handler):
+    def perform_action__(self, _finished_bool, _counter, query_data, _query_communication_handler, _printing_counter):
         station_key = (self._year, self._station_name)
         station_to_distance_avg_dict = query_data.station_to_distance_avg
         if station_key in station_to_distance_avg_dict:
