@@ -39,14 +39,15 @@ class WeatherProcessor:
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
         result_communication_handler = QueueCommunicationHandler(self._results_monitor_queue)
         while True:
-            trip_data = trip_communication_handler.recv_trip_data()
-            if trip_data is None:
+            trip_batch = trip_communication_handler.recv_trip_batch()
+            if trip_batch is None:
                 break
-            self._filter_trip(trip_data, result_communication_handler)
+            self._filter_trip_batch(trip_batch, result_communication_handler)
         result_communication_handler.send_finished()
 
-    def _filter_trip(self, trip_data, result_communication_handler):
+    def _filter_trip_batch(self, trip_batch, result_communication_handler):
         #logging.debug(f"{key}")
-        date =  trip_data.start_date_time.date()
-        if (trip_data.city_name, date) in self._days_that_rained_in_city:
-            result_communication_handler.send_rainy_trip_duration(date, trip_data.duration_sec)
+        for trip in trip_batch:
+            date =  trip.start_date_time.date()
+            if (trip.city_name, date) in self._days_that_rained_in_city:
+                result_communication_handler.send_rainy_trip_duration(date, trip.duration_sec)

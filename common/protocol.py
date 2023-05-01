@@ -118,9 +118,15 @@ class Protocol:
             self._add_station_to_packet(packet, station)
         packet.add_byte(self.FINISHED)
 
-    def add_trip_to_packet(self, packet, trip):
+    def add_trip_batch_to_packet(self, packet, trip_list):
         packet.add_byte(self.TRIP_DATA)
-        packet.add_byte(self._city_name_to_char[trip.city_name])
+        packet.add_byte(self._city_name_to_char[trip_list[0].city_name])
+        for trip in trip_list:
+            packet.add_byte(self.VALUE)
+            self._add_trip_to_packet(packet, trip)
+        packet.add_byte(self.FINISHED)
+
+    def _add_trip_to_packet(self, packet, trip):
         packet.add_data_and_time(trip.start_date_time)
         packet.add_n_byte_number(self.TWO_BYTES, trip.start_station_code)
         packet.add_data_and_time(trip.end_date_time)

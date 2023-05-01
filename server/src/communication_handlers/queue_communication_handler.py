@@ -34,22 +34,22 @@ class QueueCommunicationHandler:
         protocol.add_station_finished_to_packet(packet)
         self._queue.send(packet)
 
-    def send_batch_to_weather_process(self, weather_data):
+    def send_batch_to_weather_process(self, weather_batch):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_weather_batch_to_packet(packet, weather_data, throw_unnecessary_data=True)
+        protocol.add_weather_batch_to_packet(packet, weather_batch, throw_unnecessary_data=True) #Todo eliminar esto
         self._queue.send(packet)
 
-    def send_batch_to_station_processes(self, station_data):
+    def send_batch_to_station_processes(self, station_batch):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_stations_batch_to_packet(packet, station_data)
+        protocol.add_stations_batch_to_packet(packet, station_batch)
         self._queue.send(packet)
 
-    def send_trip_data_to_processes(self, trip_data):
+    def send_trip_batch_to_processes(self, trip_batch):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_trip_to_packet(packet, trip_data)
+        protocol.add_trip_batch_to_packet(packet, trip_batch)
         self._queue.send(packet)
 
     def send_query_ask(self):
@@ -92,15 +92,15 @@ class QueueCommunicationHandler:
         packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_weather_batch_or_finished(packet)
 
-    def recv_station_data(self):
+    def recv_station_batch(self):
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
-        return protocol.recv_station_data_or_finished(packet)
+        return protocol.recv_station_batch_or_finished(packet)
 
-    def recv_trip_data(self):
+    def recv_trip_batch(self):
         protocol = ServerProtocol()
         packet = self._queue.get_packet(self._queue_id)
-        return protocol.recv_trip_data_or_finished(packet)
+        return protocol.recv_trip_batch_or_finished(packet)
 
     def recv_results_processor_action(self):
         protocol = FilterProtocol()

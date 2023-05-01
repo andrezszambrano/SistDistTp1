@@ -29,10 +29,11 @@ class ServerProtocol(Protocol):
             return DataAction(super().WEATHER_DATA, weather_batch)
         elif message_type == super().STATION_DATA:
             station_batch = self.__recv_station_batch(byte_stream)
+            #logging.debug(f"{station_batch}")
             return DataAction(super().STATION_DATA, station_batch)
         elif message_type == super().TRIP_DATA:
-            trip_data = self.__recv_trip_data(byte_stream)
-            return DataAction(super().TRIP_DATA, trip_data)
+            trip_batch = self.__recv_trip_batch(byte_stream)
+            return DataAction(super().TRIP_DATA, trip_batch)
         elif message_type == super().WEATHER_FINISHED:
             return WeatherFinishedAction()
         else:
@@ -49,7 +50,7 @@ class ServerProtocol(Protocol):
         elif data_type == super().STATION_DATA:
             self.add_stations_batch_to_packet(packet, data)
         else:
-            self.add_trip_to_packet(packet, data)
+            self.add_trip_batch_to_packet(packet, data)
 
     def recv_data_distributer_action(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
@@ -62,7 +63,7 @@ class ServerProtocol(Protocol):
             station_batch = self.__recv_station_batch(byte_stream)
             return DataAction(super().STATION_DATA, station_batch)
         elif message_type == super().TRIP_DATA:
-            trip_data = self.__recv_trip_data(byte_stream)
+            trip_data = self.__recv_trip_batch(byte_stream)
             return DataAction(super().TRIP_DATA, trip_data)
         elif message_type == super().WEATHER_FINISHED:
             return WeatherFinishedAction()
@@ -191,17 +192,17 @@ class ServerProtocol(Protocol):
         we = self.__recv_weather_batch(byte_stream)
         return we
 
-    def recv_station_data_or_finished(self, byte_stream):
+    def recv_station_batch_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().STATION_FINISHED:
             return None
         return self.__recv_station_batch(byte_stream)
 
-    def recv_trip_data_or_finished(self, byte_stream):
+    def recv_trip_batch_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().FINISHED:
             return None
-        return self.__recv_trip_data(byte_stream)
+        return self.__recv_trip_batch(byte_stream)
 
     def recv_query_ask(self, byte_stream):
         return super()._recv_byte(byte_stream)
@@ -243,14 +244,25 @@ class ServerProtocol(Protocol):
 
     def __recv_station_batch(self, byte_stream):
         city = self.__get_city_name(byte_stream)
-        weather_batch = []
+        station_batch = []
         byte = super()._recv_byte(byte_stream)
         while byte != self.FINISHED:
-            weather = self.__recv_station_data(byte_stream, city)
-            #logging.debug(f"{weather}")
-            weather_batch.append(weather)
+            station = self.__recv_station_data(byte_stream, city)
+            #logging.debug(f"{station}")
+            station_batch.append(station)
             byte = self._recv_byte(byte_stream)
-        return weather_batch
+        return station_batch
+
+    def __recv_trip_batch(self, byte_stream):
+        city = self.__get_city_name(byte_stream)
+        trip_batch = []
+        byte = super()._recv_byte(byte_stream)
+        while byte != self.FINISHED:
+            trip = self.__recv_trip_data(byte_stream, city)
+            #logging.debug(f"{trip}")
+            trip_batch.append(trip)
+            byte = self._recv_byte(byte_stream)
+        return trip_batch
 
     def __recv_station_data(self, byte_stream, city):
         code = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
@@ -260,8 +272,7 @@ class ServerProtocol(Protocol):
         yearid = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
         return Station(city, code, name, latitude, longitude, yearid)
 
-    def __recv_trip_data(self, byte_stream):
-        city = self.__get_city_name(byte_stream)
+    def __recv_trip_data(self, byte_stream, city):
         start_date_time = super()._recv_date_time(byte_stream)
         start_station_code = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
         end_date_time = super()._recv_date_time(byte_stream)

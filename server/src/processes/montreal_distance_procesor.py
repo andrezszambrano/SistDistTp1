@@ -21,7 +21,7 @@ class MontrealDistanceProcessor:
     def _recv_station_data(self):
         communication_handler = QueueCommunicationHandler(self._stations_queue, self._stations_queue_id)
         while True:
-            station_batch = communication_handler.recv_station_data()
+            station_batch = communication_handler.recv_station_batch()
             if station_batch is None:
                 break
             for station in station_batch:
@@ -33,20 +33,21 @@ class MontrealDistanceProcessor:
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
         result_communication_handler = QueueCommunicationHandler(self._results_monitor_queue)
         while True:
-            trip_data = trip_communication_handler.recv_trip_data()
-            if trip_data is None:
+            trip_batch = trip_communication_handler.recv_trip_batch()
+            if trip_batch is None:
                 break
-            self._filter_trip(trip_data, result_communication_handler)
+            self._filter_trip_batch(trip_batch, result_communication_handler)
         result_communication_handler.send_finished()
     
-    def _filter_trip(self, trip_data, result_communication_handler):
-        if trip_data.city_name == MONTREAL:
-            if (trip_data.yearid, trip_data.start_station_code) not in self._stations:
-                return
-            starting_station_data = self._stations[(trip_data.yearid, trip_data.start_station_code)]
-            ending_station_data = self._stations[(trip_data.yearid, trip_data.end_station_code)]
-            distance = self.__calculate_distance_betwee_stations(starting_station_data, ending_station_data)
-            result_communication_handler.send_station_distance_occurence(trip_data.yearid, ending_station_data[0], distance)
+    def _filter_trip_batch(self, trip_batch, result_communication_handler):
+        for trip in trip_batch:
+            if trip.city_name == MONTREAL:
+                if (trip.yearid, trip.start_station_code) not in self._stations:
+                    return
+                starting_station_data = self._stations[(trip.yearid, trip.start_station_code)]
+                ending_station_data = self._stations[(trip.yearid, trip.end_station_code)]
+                distance = self.__calculate_distance_betwee_stations(starting_station_data, ending_station_data)
+                result_communication_handler.send_station_distance_occurence(trip.yearid, ending_station_data[0], distance)
 
     def __calculate_distance_betwee_stations(self, starting_station_data, ending_station_data):
         starting_latitude = starting_station_data[1]

@@ -26,10 +26,10 @@ class ClientCommunicationHandler:
         protocol.add_finished_to_packet(packet)
         self._socket.send(packet)
 
-    def send_trip_data(self, trips_list):
+    def send_trip_batch(self, trips_list):
         packet = Packet()
         protocol = ClientProtocol()
-        protocol.add_trip_chunk_to_packet(packet, trips_list)
+        protocol.add_trip_batch_to_packet(packet, trips_list)
         protocol.add_request_for_ack_to_packet(packet) #TODO quitar
         self._socket.send(packet)
         protocol.recv_ack(self._socket)

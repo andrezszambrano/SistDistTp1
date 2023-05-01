@@ -23,4 +23,4 @@ class DataAction(Action):
         elif self._data_type == Protocol().STATION_DATA:
             stations_communication_handler.send_batch_to_station_processes(self._data)
         else:
-            trips_communication_handler.send_trip_data_to_processes(self._data)
+            trips_communication_handler.send_trip_batch_to_processes(self._data)

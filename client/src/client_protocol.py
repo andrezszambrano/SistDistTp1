@@ -9,10 +9,6 @@ class ClientProtocol(Protocol):
     def __init__(self):
         super(ClientProtocol, self).__init__()
 
-    def add_trip_chunk_to_packet(self, packet, trips_list):
-        for trip in trips_list:
-            super().add_trip_to_packet(packet, trip)
-
     def add_request_for_ack_to_packet(self, packet):
         packet.add_byte(super().ASK_ACK)
 
