@@ -27,7 +27,7 @@ class MontrealDistanceProcessor:
             for station in station_batch:
                 if station.city_name == MONTREAL:
                     self._stations.update({(station.yearid, station.code): (station.name, station.latitude,
-                                                                                      station.longitude)})
+                                                                            station.longitude)})
 
     def _recv_and_filter_trips_data(self):
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)
@@ -38,8 +38,9 @@ class MontrealDistanceProcessor:
                 break
             self._filter_trip_batch(trip_batch, result_communication_handler)
         result_communication_handler.send_finished()
-    
+
     def _filter_trip_batch(self, trip_batch, result_communication_handler):
+        station_distance_occurrence_batch = []
         for trip in trip_batch:
             if trip.city_name == MONTREAL:
                 if (trip.yearid, trip.start_station_code) not in self._stations:
@@ -47,7 +48,9 @@ class MontrealDistanceProcessor:
                 starting_station_data = self._stations[(trip.yearid, trip.start_station_code)]
                 ending_station_data = self._stations[(trip.yearid, trip.end_station_code)]
                 distance = self.__calculate_distance_betwee_stations(starting_station_data, ending_station_data)
-                result_communication_handler.send_station_distance_occurence(trip.yearid, ending_station_data[0], distance)
+                station_distance_occurrence_batch.append((trip.yearid, ending_station_data[0], distance))
+        if len(station_distance_occurrence_batch) > 0:
+            result_communication_handler.send_station_distance_occurrence_batch(station_distance_occurrence_batch)
 
     def __calculate_distance_betwee_stations(self, starting_station_data, ending_station_data):
         starting_latitude = starting_station_data[1]

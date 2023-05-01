@@ -76,10 +76,10 @@ class QueueCommunicationHandler:
         protocol.add_rainy_trip_duration_batch(packet, rainy_trips_duration_batch)
         self._queue.send(packet)
 
-    def send_station_distance_occurence(self, year, ending_station_name, distance):
+    def send_station_distance_occurrence_batch(self, station_distance_occurrence_batch):
         packet = Packet()
         protocol = FilterProtocol()
-        protocol.add_station_name_distance_n_year(packet, year, ending_station_name, distance)
+        protocol.add_station_distance_occurrence_batch(packet, station_distance_occurrence_batch)
         self._queue.send(packet)
 
     def recv_data_distributer_action(self):

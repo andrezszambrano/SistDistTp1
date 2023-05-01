@@ -27,6 +27,13 @@ class FilterProtocol(Protocol):
             self.__add_date_n_duration(packet, rainy_trip_n_duration[0], rainy_trip_n_duration[1])
         packet.add_byte(self.FINISHED)
 
+    def add_station_distance_occurrence_batch(self,packet, station_distance_occurrence_batch):
+        packet.add_byte(self.DISTANCE_OCCURRENCE)
+        for station_n_distance in station_distance_occurrence_batch:
+            packet.add_byte(self.VALUE)
+            self._add_station_name_distance_n_year(packet, station_n_distance[0], station_n_distance[1], station_n_distance[2])
+        packet.add_byte(self.FINISHED)
+
     def add_station_occurrence_batch(self, packet, station_occurrence_batch):
         packet.add_byte(self.STATION_OCCURRENCE)
         for station_occurrence in station_occurrence_batch:
@@ -40,8 +47,7 @@ class FilterProtocol(Protocol):
         packet.add_string_and_length(city_name)
         packet.add_string_and_length(station_name)
 
-    def add_station_name_distance_n_year(self, packet, year, station_name, distance):
-        packet.add_byte(self.DISTANCE_OCCURRENCE)
+    def _add_station_name_distance_n_year(self, packet, year, station_name, distance):
         packet.add_n_byte_number(super().TWO_BYTES, year)
         packet.add_string_and_length(station_name)
         packet.add_float(distance)
@@ -67,6 +73,17 @@ class FilterProtocol(Protocol):
             byte = self._recv_byte(byte_stream)
         return station_occurrence_batch
 
+    def __recv_station_distance_occurrence_batch(self, byte_stream):
+        station_distance_occurrence_batch = []
+        byte = super()._recv_byte(byte_stream)
+        while byte != self.FINISHED:
+            year = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
+            station_name = super()._recv_string(byte_stream)
+            distance = super()._recv_float(byte_stream)
+            station_distance_occurrence_batch.append((year, station_name, distance))
+            byte = self._recv_byte(byte_stream)
+        return station_distance_occurrence_batch
+
     def recv_results_processor_action(self, byte_stream):
         act = super()._recv_byte(byte_stream)
         if act == super().FINISHED:
@@ -78,9 +95,7 @@ class FilterProtocol(Protocol):
             station_occurrence_batch = self.__recv_station_occurrence_batch(byte_stream)
             return Trip2016_17Action(station_occurrence_batch)
         elif act == self.DISTANCE_OCCURRENCE:
-            year = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
-            station_name = super()._recv_string(byte_stream)
-            distance = super()._recv_float(byte_stream)
-            return MontrealDistanceAction(year, station_name, distance)
+            station_distance_occurrence_batch = self.__recv_station_distance_occurrence_batch(byte_stream)
+            return MontrealDistanceAction(station_distance_occurrence_batch)
         else:
             return QueryAskAction()
