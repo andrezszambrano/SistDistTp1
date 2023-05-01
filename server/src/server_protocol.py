@@ -45,7 +45,6 @@ class ServerProtocol(Protocol):
 
     def add_data_to_packet(self, packet, data_type, data):
         if data_type == super().WEATHER_DATA:
-            #logging.debug(f"Sending batch to dist {data}")
             self.add_weather_batch_to_packet(packet, data)
         elif data_type == super().STATION_DATA:
             self.add_stations_batch_to_packet(packet, data)
@@ -91,7 +90,6 @@ class ServerProtocol(Protocol):
         byte = self._recv_byte(byte_stream)
         station_to_distance_avg = {}
         while byte != self.FINISHED:
-            #year = self._recv_n_byte_number(byte_stream, super().TWO_BYTES)
             station_name = self._recv_string(byte_stream)
             distance_avg = self._recv_float(byte_stream)
             station_to_distance_avg.update({(station_name): Average(distance_avg)})
@@ -149,7 +147,6 @@ class ServerProtocol(Protocol):
     def __add_station_to_distance_avg_to_packet(self, packet, station_to_distance_avg):
         for station in station_to_distance_avg:
             packet.add_byte(super().VALUE)
-            #packet.add_n_byte_number(super().TWO_BYTES, station_tuple[1])
             packet.add_string_and_length(station)
             packet.add_float(station_to_distance_avg[station].get_avg())
         packet.add_byte(super().FINISHED)
@@ -237,7 +234,6 @@ class ServerProtocol(Protocol):
         byte = super()._recv_byte(byte_stream)
         while byte != self.FINISHED:
             weather = self.__recv_weather_data(byte_stream, city)
-            #logging.debug(f"{weather}")
             weather_batch.append(weather)
             byte = self._recv_byte(byte_stream)
         return weather_batch
@@ -248,7 +244,6 @@ class ServerProtocol(Protocol):
         byte = super()._recv_byte(byte_stream)
         while byte != self.FINISHED:
             station = self.__recv_station_data(byte_stream, city)
-            #logging.debug(f"{station}")
             station_batch.append(station)
             byte = self._recv_byte(byte_stream)
         return station_batch
@@ -259,7 +254,6 @@ class ServerProtocol(Protocol):
         byte = super()._recv_byte(byte_stream)
         while byte != self.FINISHED:
             trip = self.__recv_trip_data(byte_stream, city)
-            #logging.debug(f"{trip}")
             trip_batch.append(trip)
             byte = self._recv_byte(byte_stream)
         return trip_batch

@@ -72,7 +72,7 @@ class QueryResult:
         if len(self.far_away_station_list) == 0:
             to_print_vec.append("\t\tNo far away stations")
             return
-        if len(self.far_away_station_list) > 0:
+        if len(self.far_away_station_list) < 10:
             for station_distance in self.far_away_station_list:
                 to_print_vec.append(f"\t\tName: {station_distance[0]}, avg distance: {station_distance[1]}")
         else:

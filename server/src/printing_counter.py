@@ -14,8 +14,10 @@ class PrintingCounter:
         self._counter = self._counter + 1
         if self._counter % self._module == 0:
             now = time.time()
-            logging.debug(f"{self._name}: {self._counter}. Seconds between {self._module} increase: {round(now - self._last_time, 4)}s "
-                        + f"Total seconds: {round(now - self._start_time, 4)}s")
+            secs_since_last_time = round(now - self._last_time, 4)
+            ratio = round(self._module/secs_since_last_time, 1)
+            logging.debug(f"{self._name}: {self._counter}. Seconds between {self._module} increase: {secs_since_last_time}s "
+                        + f"Total seconds: {round(now - self._start_time, 4)}s. Ratio: {ratio}inc/s")
             self._last_time = now
 
     def print_final(self):

@@ -53,6 +53,6 @@ class QueryProcessor:
     def __parse_n_filter_station_to_distance_avg_dict_to_list(self, station_to_distance_avg):
         far_away_station_list = []
         for station, avg in iter(sorted(station_to_distance_avg.items())):
-            if avg.get_avg() > 6:
+            if avg.get_avg() >= 6:
                 far_away_station_list.append((station, avg.get_avg()))
         return far_away_station_list

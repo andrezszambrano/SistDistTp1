@@ -1,4 +1,3 @@
-import logging
 
 from ..utils.running_average import RunningAverage
 
@@ -19,4 +18,3 @@ class MontrealDistanceAction:
             else:
                 station_to_distance_avg_dict.update({station_key: RunningAverage(distance, 1)})
             printing_counter.increase()
-        #logging.debug(f"{station_to_distance_avg_dict}")
