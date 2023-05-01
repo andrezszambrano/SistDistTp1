@@ -8,7 +8,7 @@ from .weather import Weather
 from .trip import Trip
 
 DATA_PATH = "data/"
-KB_250 = 250 * 1024  # 250 Kb
+KB_50 = 50 * 1024  # 50 Kb
 WEATHER = "weather.csv"
 STATIONS = "stations.csv"
 TRIPS = "nice_trips.csv"
@@ -47,15 +47,15 @@ class CityDataReader:
         self._queue = queue
 
     def run(self):
-        weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", KB_250,
+        weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", KB_50,
                                                   row_to_weather_obj, self._city_name)
         self.__send_chunks(weather_chunk_generator, WEATHER_DATA, WEATHER_FINISHED)
         logging.info(f"{self._city_name}: Weather data read")
-        stations_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{STATIONS}", KB_250,
+        stations_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{STATIONS}", KB_50,
                                                    row_to_station_obj, self._city_name)
         self.__send_chunks(stations_chunk_generator, STATION_DATA, STATION_FINISHED)
         logging.info(f"{self._city_name}: Station data read")
-        trips_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{TRIPS}", KB_250,
+        trips_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{TRIPS}", KB_50,
                                                    row_to_trip_obj, self._city_name)
         self.__send_chunks(trips_chunk_generator, TRIP_DATA, 'o')
         logging.info(f"{self._city_name}: Trip data read")
