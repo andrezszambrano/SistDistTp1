@@ -21,6 +21,6 @@ class DataAction(Action):
         if self._data_type == Protocol().WEATHER_DATA:
             weather_communication_handler.send_batch_to_weather_process(self._data)
         elif self._data_type == Protocol().STATION_DATA:
-            stations_communication_handler.send_data_to_station_processes(self._data)
+            stations_communication_handler.send_batch_to_station_processes(self._data)
         else:
             trips_communication_handler.send_trip_data_to_processes(self._data)

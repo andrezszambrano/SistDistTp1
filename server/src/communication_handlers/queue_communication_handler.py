@@ -40,10 +40,10 @@ class QueueCommunicationHandler:
         protocol.add_weather_batch_to_packet(packet, weather_data, throw_unnecessary_data=True)
         self._queue.send(packet)
 
-    def send_data_to_station_processes(self, station_data):
+    def send_batch_to_station_processes(self, station_data):
         packet = Packet()
         protocol = ServerProtocol()
-        protocol.add_station_to_packet(packet, station_data)
+        protocol.add_stations_batch_to_packet(packet, station_data)
         self._queue.send(packet)
 
     def send_trip_data_to_processes(self, trip_data):

@@ -8,10 +8,10 @@ class ClientCommunicationHandler:
     def __init__(self, socket):
         self._socket = socket
 
-    def send_station_data(self, stations_list):
+    def send_station_batch(self, stations_list):
         packet = Packet()
         protocol = ClientProtocol()
-        protocol.add_stations_chunk_to_packet(packet, stations_list)
+        protocol.add_stations_batch_to_packet(packet, stations_list)
         self._socket.send(packet)
 
     def send_weather_batch(self, weathers_list):

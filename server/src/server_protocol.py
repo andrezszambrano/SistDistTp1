@@ -28,8 +28,8 @@ class ServerProtocol(Protocol):
             weather_batch = self.__recv_weather_batch(byte_stream)
             return DataAction(super().WEATHER_DATA, weather_batch)
         elif message_type == super().STATION_DATA:
-            station_data = self.__recv_station_data(byte_stream)
-            return DataAction(super().STATION_DATA, station_data)
+            station_batch = self.__recv_station_batch(byte_stream)
+            return DataAction(super().STATION_DATA, station_batch)
         elif message_type == super().TRIP_DATA:
             trip_data = self.__recv_trip_data(byte_stream)
             return DataAction(super().TRIP_DATA, trip_data)
@@ -47,7 +47,7 @@ class ServerProtocol(Protocol):
             #logging.debug(f"Sending batch to dist {data}")
             self.add_weather_batch_to_packet(packet, data)
         elif data_type == super().STATION_DATA:
-            self.add_station_to_packet(packet, data)
+            self.add_stations_batch_to_packet(packet, data)
         else:
             self.add_trip_to_packet(packet, data)
 
@@ -59,8 +59,8 @@ class ServerProtocol(Protocol):
             weather_batch = self.__recv_weather_batch(byte_stream)
             return DataAction(super().WEATHER_DATA, weather_batch)
         elif message_type == super().STATION_DATA:
-            station_data = self.__recv_station_data(byte_stream)
-            return DataAction(super().STATION_DATA, station_data)
+            station_batch = self.__recv_station_batch(byte_stream)
+            return DataAction(super().STATION_DATA, station_batch)
         elif message_type == super().TRIP_DATA:
             trip_data = self.__recv_trip_data(byte_stream)
             return DataAction(super().TRIP_DATA, trip_data)
@@ -195,7 +195,7 @@ class ServerProtocol(Protocol):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().STATION_FINISHED:
             return None
-        return self.__recv_station_data(byte_stream)
+        return self.__recv_station_batch(byte_stream)
 
     def recv_trip_data_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
@@ -241,8 +241,18 @@ class ServerProtocol(Protocol):
             byte = self._recv_byte(byte_stream)
         return weather_batch
 
-    def __recv_station_data(self, byte_stream):
+    def __recv_station_batch(self, byte_stream):
         city = self.__get_city_name(byte_stream)
+        weather_batch = []
+        byte = super()._recv_byte(byte_stream)
+        while byte != self.FINISHED:
+            weather = self.__recv_station_data(byte_stream, city)
+            #logging.debug(f"{weather}")
+            weather_batch.append(weather)
+            byte = self._recv_byte(byte_stream)
+        return weather_batch
+
+    def __recv_station_data(self, byte_stream, city):
         code = super()._recv_n_byte_number(byte_stream, super().TWO_BYTES)
         name = super()._recv_string(byte_stream)
         latitude = super()._recv_float_else_none(byte_stream)

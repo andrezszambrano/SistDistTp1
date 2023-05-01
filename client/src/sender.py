@@ -38,7 +38,7 @@ class Sender:
             elif data[0] == WEATHER_DATA:
                 communication_handler.send_weather_batch(data[1])
             elif data[0] == STATION_DATA:
-                communication_handler.send_station_data(data[1])
+                communication_handler.send_station_batch(data[1])
             elif data[0] == TRIP_DATA:
                 communication_handler.send_trip_data(data[1])
         communication_handler.send_finished()

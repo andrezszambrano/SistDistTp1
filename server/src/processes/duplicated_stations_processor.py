@@ -1,6 +1,7 @@
 import logging
 
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
+from ..printing_counter import PrintingCounter
 
 
 class DuplicatedStationsProcessor:
@@ -14,17 +15,20 @@ class DuplicatedStationsProcessor:
 
     def run(self):
         self._recv_station_data()
-
         self._recv_and_filter_trips_data()
 
     def _recv_station_data(self):
         communication_handler = QueueCommunicationHandler(self._stations_queue, self._stations_queue_id)
+        printing_counter = PrintingCounter("Stations", 1000)
         while True:
-            station_data = communication_handler.recv_station_data()
-            if station_data is None:
+            station_batch = communication_handler.recv_station_data()
+            if station_batch is None:
                 break
-            if station_data.yearid in [2016, 2017]:
-                self._stations.update({(station_data.city_name, station_data.yearid, station_data.code): station_data.name})
+            for station in station_batch:
+                if station.yearid in [2016, 2017]:
+                    self._stations.update({(station.city_name, station.yearid, station.code): station.name})
+                printing_counter.increase()
+        printing_counter.print_final()
 
     def _recv_and_filter_trips_data(self):
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)

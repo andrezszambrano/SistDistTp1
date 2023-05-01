@@ -21,12 +21,13 @@ class MontrealDistanceProcessor:
     def _recv_station_data(self):
         communication_handler = QueueCommunicationHandler(self._stations_queue, self._stations_queue_id)
         while True:
-            station_data = communication_handler.recv_station_data()
-            if station_data is None:
+            station_batch = communication_handler.recv_station_data()
+            if station_batch is None:
                 break
-            if station_data.city_name == MONTREAL:
-                self._stations.update({(station_data.yearid, station_data.code): (station_data.name, station_data.latitude,
-                                                                                  station_data.longitude)})
+            for station in station_batch:
+                if station.city_name == MONTREAL:
+                    self._stations.update({(station.yearid, station.code): (station.name, station.latitude,
+                                                                                      station.longitude)})
 
     def _recv_and_filter_trips_data(self):
         trip_communication_handler = QueueCommunicationHandler(self._trips_queue, self._trips_queue_id)

@@ -11,7 +11,7 @@ DATA_PATH = "data/"
 KB_250 = 250 * 1024  # 250 Kb
 WEATHER = "weather.csv"
 STATIONS = "stations.csv"
-TRIPS = "rainy_trips.csv"
+TRIPS = "some_2016_2017_trips.csv"
 
 
 def row_to_weather_obj(row, city_name):
@@ -30,7 +30,7 @@ def row_to_station_obj(row, city_name):
 
 
 def row_to_trip_obj(row, city_name):
-    offset = 0
+    offset = 1
     IS_MEMBER = 1
     duration = int(round(float(row[4 + offset])))
     if duration < 0:

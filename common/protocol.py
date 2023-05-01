@@ -68,9 +68,7 @@ class Protocol:
             packet.add_byte(self.FLOAT)
             packet.add_float(float_number)
 
-    def add_station_to_packet(self, packet, station):
-        packet.add_byte(self.STATION_DATA)
-        packet.add_byte(self._city_name_to_char[station.city_name])
+    def _add_station_to_packet(self, packet, station):
         packet.add_n_byte_number(self.TWO_BYTES, station.code)
         packet.add_string_and_length(station.name)
         self._add_float_else_none(packet, station.latitude)
@@ -110,6 +108,14 @@ class Protocol:
         for weather in weather_list:
             packet.add_byte(self.VALUE)
             self._add_weather_to_packet(packet, weather, throw_unnecessary_data)
+        packet.add_byte(self.FINISHED)
+
+    def add_stations_batch_to_packet(self, packet, stations_list):
+        packet.add_byte(self.STATION_DATA)
+        packet.add_byte(self._city_name_to_char[stations_list[0].city_name])
+        for station in stations_list:
+            packet.add_byte(self.VALUE)
+            self._add_station_to_packet(packet, station)
         packet.add_byte(self.FINISHED)
 
     def add_trip_to_packet(self, packet, trip):
