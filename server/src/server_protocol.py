@@ -91,10 +91,10 @@ class ServerProtocol(Protocol):
         byte = self._recv_byte(byte_stream)
         station_to_distance_avg = {}
         while byte != self.FINISHED:
-            year = self._recv_n_byte_number(byte_stream, super().TWO_BYTES)
+            #year = self._recv_n_byte_number(byte_stream, super().TWO_BYTES)
             station_name = self._recv_string(byte_stream)
             distance_avg = self._recv_float(byte_stream)
-            station_to_distance_avg.update({(year, station_name): Average(distance_avg)})
+            station_to_distance_avg.update({(station_name): Average(distance_avg)})
             byte = self._recv_byte(byte_stream)
         return station_to_distance_avg
 
@@ -147,11 +147,11 @@ class ServerProtocol(Protocol):
         packet.add_byte(super().FINISHED)
 
     def __add_station_to_distance_avg_to_packet(self, packet, station_to_distance_avg):
-        for station_tuple in station_to_distance_avg:
+        for station in station_to_distance_avg:
             packet.add_byte(super().VALUE)
-            packet.add_n_byte_number(super().TWO_BYTES, station_tuple[1])
-            packet.add_string_and_length(station_tuple[0])
-            packet.add_float(station_to_distance_avg[station_tuple].get_avg())
+            #packet.add_n_byte_number(super().TWO_BYTES, station_tuple[1])
+            packet.add_string_and_length(station)
+            packet.add_float(station_to_distance_avg[station].get_avg())
         packet.add_byte(super().FINISHED)
 
     def __add_station_that_doubled_list(self, packet, station_that_doubled_list):

@@ -18,7 +18,7 @@ class ResultMonitorProcessor:
         query_communication_handler = QueueCommunicationHandler(self._query_queue)
         finished_bool = MutableBoolean(False)
         counter = Counter()
-        printing_counter = PrintingCounter("Registered in result", 10000)
+        printing_counter = PrintingCounter("Registered in result", 100000)
         while not finished_bool.get_boolean():
             action = result_monitor_communication_handler.recv_results_processor_action()
             action.perform_action__(finished_bool, counter, self._query_results, query_communication_handler, printing_counter)
