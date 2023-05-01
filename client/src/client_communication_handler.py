@@ -30,9 +30,7 @@ class ClientCommunicationHandler:
         packet = Packet()
         protocol = ClientProtocol()
         protocol.add_trip_batch_to_packet(packet, trips_list)
-        protocol.add_request_for_ack_to_packet(packet) #TODO quitar
         self._socket.send(packet)
-        protocol.recv_ack(self._socket)
 
     def send_weather_finished(self):
         packet = Packet()

@@ -16,4 +16,4 @@ class MontrealDistanceAction:
                 station_to_distance_avg_dict[station_key].recalculate_avg(distance)
             else:
                 station_to_distance_avg_dict.update({station_key: RunningAverage(distance, 1)})
-        printing_counter.increase()
+            printing_counter.increase()
