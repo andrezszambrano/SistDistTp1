@@ -11,7 +11,7 @@ DATA_PATH = "data/"
 KB_250 = 250 * 1024  # 250 Kb
 WEATHER = "weather.csv"
 STATIONS = "stations.csv"
-TRIPS = "arriving_trips.csv"
+TRIPS = "nice_trips.csv"
 
 
 def row_to_weather_obj(row, city_name):

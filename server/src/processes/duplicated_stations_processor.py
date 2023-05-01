@@ -40,4 +40,6 @@ class DuplicatedStationsProcessor:
         year =  trip_data.start_date_time.date().year
         if year in [2016, 2017]:
             station_key = (trip_data.city_name, year, trip_data.start_station_code)
+            if station_key not in self._stations:
+                return
             result_communication_handler.send_station_occurrence(year, trip_data.city_name, self._stations[station_key])

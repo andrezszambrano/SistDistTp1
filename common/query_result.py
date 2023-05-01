@@ -12,10 +12,12 @@ class QueryResult:
         self.final_result = True
 
     def print(self):
+        if not self.final_result:
+            return
         to_print_vec = [""]
         self.__append_final_or_partial_result(to_print_vec)
-        #self.__append_weather_query(to_print_vec)
-        #self.__append_duplicated_stations_query(to_print_vec)
+        self.__append_weather_query(to_print_vec)
+        self.__append_duplicated_stations_query(to_print_vec)
         self.__append_far_away_stations_query(to_print_vec)
         to_print = "\n".join(to_print_vec)
         logging.info(f"{to_print}")
