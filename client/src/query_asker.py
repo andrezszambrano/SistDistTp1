@@ -1,3 +1,4 @@
+import logging
 import time
 
 from .client_communication_handler import ClientCommunicationHandler
@@ -6,13 +7,14 @@ from .socket_wrapper import Socket
 
 
 class QueryAsker:
-    MAX_ATTEMPTS = 5
-    DELAY_BETWEEN_ATTEMPTS = 3
+    MAX_ATTEMPTS = 50
+    DELAY_BETWEEN_ATTEMPTS = 4
     WAIT = 10
 
     def __init__(self, server_address):
         self._host, _port = server_address.split(':')
-        self._port = int(_port) + 1
+        self._port = int(_port)
+        logging.info(f"{self._host}:{self._port}")
 
     def run(self):
         socket = self._connect()
@@ -29,7 +31,6 @@ class QueryAsker:
         while attempts < self.MAX_ATTEMPTS:
             try:
                 return Socket(self._host, self._port)
-            except ConnectionRefusedError:
+            except ConnectionRefusedError as e:
                 time.sleep(self.DELAY_BETWEEN_ATTEMPTS)
                 attempts += 1
-        time.sleep(self.WAIT)

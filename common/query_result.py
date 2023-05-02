@@ -13,7 +13,8 @@ class QueryResult:
 
     def print(self):
         if not self.final_result:
-            return
+            pass
+            #return
         to_print_vec = [""]
         self.__append_final_or_partial_result(to_print_vec)
         to_print_vec.append("")

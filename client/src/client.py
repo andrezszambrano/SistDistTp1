@@ -8,10 +8,10 @@ from .query_asker import QueryAsker
 from .sender import Sender
 
 class Client:
-    def __init__(self, server_address):
+    def __init__(self, server_address, query_address):
         # Initialize server socket
         self._sender = Sender(server_address)
-        self.query_asker = QueryAsker(server_address)
+        self.query_asker = QueryAsker(query_address)
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
 
     def __exit_gracefully(self, signum, frame):

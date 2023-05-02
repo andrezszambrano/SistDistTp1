@@ -110,7 +110,8 @@ class QueueCommunicationHandler:
             packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_results_processor_action(packet)
 
-    def recv_query_data(self):
+    def recv_query_data(self, packet=None):
         protocol = ServerProtocol()
-        packet = self._queue.get_packet(self._queue_id)
+        if packet is None:
+            packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_query_data(packet)

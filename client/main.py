@@ -34,6 +34,7 @@ def initialize_config():
     config_params = {}
     try:
         config_params["server_address"] = os.getenv('SERVER_ADDRESS', config["DEFAULT"]["SERVER_ADDRESS"])
+        config_params["query_address"] = os.getenv('QUERY_ADDRESS', config["DEFAULT"]["QUERY_ADDRESS"])
         config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
@@ -46,6 +47,7 @@ def main():
     config_params = initialize_config()
     logging_level = config_params["logging_level"]
     server_address = config_params["server_address"]
+    query_address = config_params["query_address"]
     initialize_log(logging_level)
 
     # Log config parameters at the beginning of the program to verify the configuration
@@ -56,7 +58,7 @@ def main():
     sleep(15)
 
     # Initialize client
-    client = Client(server_address)
+    client = Client(server_address, query_address)
     client.run()
     sys.exit(0)
 

@@ -14,6 +14,5 @@ class RabbProdConsQueue(PacketSender):
     def start_recv_loop(self):
         self._channel.start_consuming()
 
-
     def send(self, packet):
         self._channel.basic_publish(exchange="", routing_key=self._queue_name, body=packet.get_bytes())

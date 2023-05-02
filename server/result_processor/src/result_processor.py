@@ -15,16 +15,16 @@ class ResultMonitorProcessor:
         self._result_monitor_communication_handler = QueueCommunicationHandler(None)
         self._printing_counter = PrintingCounter("Registered in result", 10000)
         self._counter = Counter()
-        #self._query_queue = query_queue
+        query_queue = RabbProdConsQueue(channel, "QueryData")
+        self._query_communication_handler = QueueCommunicationHandler(query_queue)
         self._query_results = QueryData({}, {2016: {}, 2017: {}}, {}, False)
 
     def __process_result_data(self, _ch, _method, _properties, body):
         action = self._result_monitor_communication_handler.recv_results_processor_action(Packet(body))
-        action.perform_action__(None, self._counter, self._query_results, None,
+        action.perform_action__(None, self._counter, self._query_results, self._query_communication_handler,
                                 self._printing_counter)
 
     def run(self):
-        #query_communication_handler = QueueCommunicationHandler(self._query_queue)
         try:
             self._results_monitor_queue.start_recv_loop()
         except FinalizedException:
