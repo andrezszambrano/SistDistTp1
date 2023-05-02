@@ -1,3 +1,5 @@
+import logging
+
 from ..utils.running_average import RunningAverage
 
 
@@ -9,6 +11,7 @@ class RainyTripAction:
         #query_results.update_date_to_avg_dict(self._date, self._duration_sec)
         date_to_avg_dict = query_data.date_to_duration_avg
         for rainy_trip_n_duration in self._rainy_trip_duration_batch:
+            logging.info(f"{rainy_trip_n_duration}")
             date = rainy_trip_n_duration[0]
             duration = rainy_trip_n_duration[1]
             if date in date_to_avg_dict:

@@ -104,9 +104,10 @@ class QueueCommunicationHandler:
             packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_trip_batch_or_finished(packet)
 
-    def recv_results_processor_action(self):
+    def recv_results_processor_action(self, packet=None):
         protocol = FilterProtocol()
-        packet = self._queue.get_packet(self._queue_id)
+        if packet is None:
+            packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_results_processor_action(packet)
 
     def recv_query_data(self):

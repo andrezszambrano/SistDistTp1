@@ -21,6 +21,7 @@ docker-image:
 	docker build -f ./server/Dockerfile -t "server:latest" .
 	docker build -f ./server/data_distributor_processor/Dockerfile -t "data_distributor_processor:latest" .
 	docker build -f ./server/weather_processor/Dockerfile -t "weather_processor_image:latest" .
+	docker build -f ./server/result_processor/Dockerfile -t "result_processor:latest" .
 	docker build -f ./client/Dockerfile -t "client:latest" .
 
 	# Execute this command from time to time to clean up intermediate stages generated 

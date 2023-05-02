@@ -14,7 +14,6 @@ class DataDistributor:
     MONTREAL_QUEUE_ID = 1
 
     def __init__(self, channel):
-        self._channel = channel
         self._data_queue = RabbProdConsQueue(channel, "AllData", self.__process_data)
         self._weather_queue = RabbProdConsQueue(channel, "WeatherData")
         #self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
@@ -33,11 +32,4 @@ class DataDistributor:
         try:
             self._data_queue.start_recv_loop()
         except FinalizedException:
-            logging.info(f"Finished receiving weather data")
-        #weather_processor = self.__create_and_run_weather_processor()
-        #duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
-        #montreal_distance_processor = self.__create_and_run_montreal_processor()
-
-        #weather_processor.join()
-        #duplicated_stations_processor.join()
-        #montreal_distance_processor.join()
+            logging.info(f"Finished receiving all data")

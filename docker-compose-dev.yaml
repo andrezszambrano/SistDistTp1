@@ -53,6 +53,20 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  result_processor:
+    container_name: result_processor
+    image: result_processor:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
   client:
     container_name: client
     image: client:latest

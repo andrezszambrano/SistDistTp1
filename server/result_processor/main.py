@@ -5,7 +5,7 @@ from configparser import ConfigParser
 from time import sleep
 
 from src.rabbit_initializer import RabbitInitializer
-from src.data_distributor import DataDistributor
+from src.result_processor import ResultMonitorProcessor
 import logging
 import os
 
@@ -52,7 +52,7 @@ def main():
     channel = rabbit_initializer.get_channel()
 
     try:
-        process = DataDistributor(channel)
+        process = ResultMonitorProcessor(channel)
         process.run()
     except Exception as _e:
         logging.info(traceback.format_exc())
