@@ -17,9 +17,6 @@ class WeatherProcessor:
         self._weather_communication_handler = QueueCommunicationHandler(None)
         self._result_communication_handler = QueueCommunicationHandler(self._result_queue)
         self._days_that_rained_in_city = set()
-        #self._trips_queue = trips_queue_n_id_tuple[0]
-        #self._trips_queue_id = trips_queue_n_id_tuple[1]
-        #self._results_monitor_queue = results_monitor_queue
 
     def run(self):
         self.__recv_weather_data()
@@ -47,12 +44,12 @@ class WeatherProcessor:
         if trip_batch is None:
             raise FinalizedException()
         self.__filter_trip_batch(trip_batch)
-        #result_communication_handler.send_finished()
 
     def __recv_and_filter_trips_data(self):
         try:
             self._trip_queue.start_recv_loop()
         except FinalizedException:
+            self._result_communication_handler.send_finished()
             logging.info(f"Finished receiving weather data")
 
     def __filter_trip_batch(self, trip_batch):

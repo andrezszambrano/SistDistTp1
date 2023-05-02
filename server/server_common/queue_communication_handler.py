@@ -93,9 +93,10 @@ class QueueCommunicationHandler:
             packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_weather_batch_or_finished(packet)
 
-    def recv_station_batch(self):
+    def recv_station_batch(self, packet=None):
         protocol = ServerProtocol()
-        packet = self._queue.get_packet(self._queue_id)
+        if packet is None:
+            packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_station_batch_or_finished(packet)
 
     def recv_trip_batch(self, packet=None):

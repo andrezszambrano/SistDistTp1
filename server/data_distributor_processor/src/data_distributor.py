@@ -16,17 +16,17 @@ class DataDistributor:
     def __init__(self, channel):
         self._data_queue = RabbProdConsQueue(channel, "AllData", self.__process_data)
         self._weather_queue = RabbProdConsQueue(channel, "WeatherData")
-        #self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
+        self._station_queue = RabbProdConsQueue(channel, "StationData")
         self._trips_queue = RabbPublSubsQueue(channel, "TripData")
-        #self._results_monitor_queue = results_monitor_queue
 
     def __process_data(self, _ch, _method, _properties, body):
         server_communication_handler = QueueCommunicationHandler(self._data_queue)
         weather_communication_handler = QueueCommunicationHandler(self._weather_queue)
-        #stations_communication_handler = QueueCommunicationHandler(self._stations_queue)
+        stations_communication_handler = QueueCommunicationHandler(self._station_queue)
         trips_communication_handler = QueueCommunicationHandler(self._trips_queue)
         action = server_communication_handler.recv_data_distributer_action(Packet(body))
-        action.perform_action_(None, weather_communication_handler, None, trips_communication_handler)
+        action.perform_action_(None, weather_communication_handler, stations_communication_handler,
+                               trips_communication_handler)
 
     def run(self):
         try:

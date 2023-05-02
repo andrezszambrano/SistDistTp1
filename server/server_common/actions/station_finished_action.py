@@ -9,5 +9,4 @@ class StationFinishedAction:
 
     def perform_action_(self, _finished_bool, _weather_communication_handler, stations_communication_handler,
                     _trips_communication_handler):
-        pass
-        #stations_communication_handler.send_station_finished_to_distributer()
+        stations_communication_handler.send_station_finished_to_distributer()
