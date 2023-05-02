@@ -27,6 +27,7 @@ class WeatherProcessor:
         if weather_batch is None:
             raise FinalizedException()
         for weather in weather_batch:
+            logging.info(f"{weather.info()}")
             if weather.prectot > self.MIN_PRECTOT:
                 self._days_that_rained_in_city.add((weather.city_name, weather.date))
 

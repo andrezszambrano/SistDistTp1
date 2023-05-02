@@ -9,6 +9,7 @@ from .processes.query_processor import QueryProcessor
 from .processes.result_processor import ResultMonitorProcessor
 from .mutable_boolean import MutableBoolean
 from .queues.prod_cons_queue import ProdConsQueue
+from .queues.rabb_prod_cons_queue import RabbProdConsQueue
 
 
 class Server:
@@ -19,22 +20,22 @@ class Server:
         self._acceptor_socket = AcceptorSocket('', port, listen_backlog)
         self._client_processes = []
         self._channel = channel
-        self._prod_cons_queue = ProdConsQueue()
+        self._queue_for_all_data = RabbProdConsQueue(channel, "AllData")
         self._results_monitor_queue = ProdConsQueue()
         self._query_queue = ProdConsQueue()
 
     def run(self):
         socket = self._acceptor_socket.accept()
         client_communicator_handler = SocketCommunicationHandler(socket)
-        distributor_communicator_handler = QueueCommunicationHandler(queue=self._prod_cons_queue)
+        distributor_communicator_handler = QueueCommunicationHandler(queue=self._queue_for_all_data)
         finished_bool = MutableBoolean(False)
-        data_distributer_process = self.__create_and_run_data_distributer_process()
+        #data_distributer_process = self.__create_and_run_data_distributer_process()
         query_processor = self.__create_and_run_query_processor()
         result_monitor_processor = self.__create_and_run_results_processor()
         while not finished_bool.get_boolean():
             action = client_communicator_handler.recv_action()
             action.perform_action(finished_bool, client_communicator_handler, distributor_communicator_handler)
-        data_distributer_process.join()
+        #data_distributer_process.join()
         result_monitor_processor.join()
         query_processor.join()
         socket.shutdown_and_close()

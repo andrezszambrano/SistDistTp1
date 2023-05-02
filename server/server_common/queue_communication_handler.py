@@ -81,9 +81,10 @@ class QueueCommunicationHandler:
         protocol.add_station_distance_occurrence_batch(packet, station_distance_occurrence_batch)
         self._queue.send(packet)
 
-    def recv_data_distributer_action(self):
+    def recv_data_distributer_action(self, packet=None):
         protocol = ServerProtocol()
-        packet = self._queue.get_packet(self._queue_id)
+        if packet is None:
+            packet = self._queue.get_packet(self._queue_id)
         return protocol.recv_data_distributer_action(packet)
 
     def recv_weather_batch(self, packet=None):

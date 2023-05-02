@@ -1,12 +1,10 @@
 import logging
 from multiprocessing import Process
 
-from .result_processor import ResultMonitorProcessor
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from .duplicated_stations_processor import DuplicatedStationsProcessor
 from .montreal_distance_procesor import MontrealDistanceProcessor
 from ..mutable_boolean import MutableBoolean
-from ..queues.prod_cons_queue import ProdConsQueue
 from ..queues.publ_subs_queue import PublSubsQueue
 from .weather_processor import WeatherProcessor
 from ..queues.rabb_prod_cons_queue import RabbProdConsQueue

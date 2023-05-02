@@ -1,5 +1,6 @@
 
 from .action import Action
+from ..finalized_exception import FinalizedException
 
 
 class FinishedAction(Action):
@@ -12,10 +13,11 @@ class FinishedAction(Action):
 
     def perform_action_(self, finished_bool, weather_communication_handler, stations_communication_handler,
                         trips_communication_handler):
-        finished_bool.set(True)
+        #finished_bool.set(True)
         weather_communication_handler.send_finished()
         stations_communication_handler.send_finished()
         trips_communication_handler.send_finished()
+        raise FinalizedException()
 
     def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler, printing_counter):
         counter.increase()

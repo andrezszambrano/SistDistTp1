@@ -25,6 +25,20 @@ services:
         target: /config/config.ini
         read_only: true
 
+  data_distributor_processor:
+    container_name: data_distributor_processor
+    image: data_distributor_processor:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
   weather_processor:
     container_name: weather_processor
     image: weather_processor_image:latest

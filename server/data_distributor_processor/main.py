@@ -4,7 +4,7 @@ from configparser import ConfigParser
 from time import sleep
 
 from src.rabbit_initializer import RabbitInitializer
-from src.weather_processor import WeatherProcessor
+from src.data_distributor import DataDistributor
 import logging
 import os
 
@@ -50,7 +50,7 @@ def main():
     rabbit_initializer = RabbitInitializer()
     channel = rabbit_initializer.get_channel()
 
-    process = WeatherProcessor(channel)
+    process = DataDistributor(channel)
     process.run()
     sys.exit(0)
 
