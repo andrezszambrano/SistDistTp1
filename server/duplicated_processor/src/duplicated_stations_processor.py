@@ -9,7 +9,7 @@ from .rabb_publ_subs_queue import RabbPublSubsQueue
 
 class DuplicatedStationsProcessor:
     def __init__(self, channel):
-        self._station_queue = RabbProdConsQueue(channel, "StationData", self.__process_station_data)
+        self._station_queue = RabbPublSubsQueue(channel, "StationData", self.__process_station_data)
         self._trip_queue = RabbPublSubsQueue(channel, "TripData", self.__process_trip_data)
         self._communication_handler = QueueCommunicationHandler(None)
         result_queue = RabbProdConsQueue(channel, "ResultData")
@@ -18,7 +18,6 @@ class DuplicatedStationsProcessor:
 
     def run(self):
         self._recv_station_data()
-        logging.info(f"{self._stations}")
         self._recv_and_filter_trips_data()
 
     def __process_station_data(self, _ch, _method, _properties, body):

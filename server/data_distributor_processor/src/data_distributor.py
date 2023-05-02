@@ -16,7 +16,7 @@ class DataDistributor:
     def __init__(self, channel):
         self._data_queue = RabbProdConsQueue(channel, "AllData", self.__process_data)
         self._weather_queue = RabbProdConsQueue(channel, "WeatherData")
-        self._station_queue = RabbProdConsQueue(channel, "StationData")
+        self._station_queue = RabbPublSubsQueue(channel, "StationData")
         self._trips_queue = RabbPublSubsQueue(channel, "TripData")
 
     def __process_data(self, _ch, _method, _properties, body):

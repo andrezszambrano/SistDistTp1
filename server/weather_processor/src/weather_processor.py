@@ -20,7 +20,9 @@ class WeatherProcessor:
 
     def run(self):
         self.__recv_weather_data()
+        logging.info("Finished receiving weather")
         self.__recv_and_filter_trips_data()
+        logging.info("Finished receiving trips")
 
     def __process_weather_data(self, _ch, _method, _properties, body):
         weather_batch = self._weather_communication_handler.recv_weather_batch(Packet(body))
@@ -39,7 +41,6 @@ class WeatherProcessor:
 
     def __process_trip_data(self, _ch, _method, _properties, body):
         trip_communication_handler = QueueCommunicationHandler(None)
-        #result_communication_handler = QueueCommunicationHandler(self._results_monitor_queue)
         trip_batch = trip_communication_handler.recv_trip_batch(Packet(body))
         if trip_batch is None:
             raise FinalizedException()

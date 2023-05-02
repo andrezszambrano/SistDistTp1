@@ -53,10 +53,23 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
-
   duplicated_processor:
     container_name: duplicated_processor
     image: duplicated_processor:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  montreal_distance_processor:
+    container_name: montreal_distance_processor
+    image: montreal_distance_processor:latest
     entrypoint: python3 /main.py
     #restart: on-failure
     depends_on:
