@@ -9,6 +9,7 @@ from ..mutable_boolean import MutableBoolean
 from ..queues.prod_cons_queue import ProdConsQueue
 from ..queues.publ_subs_queue import PublSubsQueue
 from .weather_processor import WeatherProcessor
+from ..queues.rabb_prod_cons_queue import RabbProdConsQueue
 
 
 class DataDistributer:
@@ -17,9 +18,9 @@ class DataDistributer:
     DUPLICATED_STATIONS_QUEUE_ID = 0
     MONTREAL_QUEUE_ID = 1
 
-    def __init__(self, data_queue, results_monitor_queue):
+    def __init__(self, data_queue, results_monitor_queue, channel):
         self._data_queue = data_queue
-        self._weather_queue = ProdConsQueue()
+        self._weather_queue = RabbProdConsQueue(channel, "WeatherData", None) #Todo Put Channel
         self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
         self._trips_queue = PublSubsQueue(self.AMOUNT_OF_TRIP_SUBS)
         self._results_monitor_queue = results_monitor_queue
@@ -31,16 +32,16 @@ class DataDistributer:
         stations_communication_handler = QueueCommunicationHandler(self._stations_queue)
         trips_communication_handler = QueueCommunicationHandler(self._trips_queue)
 
-        weather_processor = self.__create_and_run_weather_processor()
-        duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
-        montreal_distance_processor = self.__create_and_run_montreal_processor()
+        #weather_processor = self.__create_and_run_weather_processor()
+        #duplicated_stations_processor = self.__create_and_run_duplicated_stations_processor()
+        #montreal_distance_processor = self.__create_and_run_montreal_processor()
         while not finished_bool.get_boolean():
             action = server_communication_handler.recv_data_distributer_action()
             action.perform_action_(finished_bool, weather_communication_handler, stations_communication_handler,
                                    trips_communication_handler)
-        weather_processor.join()
-        duplicated_stations_processor.join()
-        montreal_distance_processor.join()
+        #weather_processor.join()
+        #duplicated_stations_processor.join()
+        #montreal_distance_processor.join()
 
     def __create_and_run_weather_processor(self):
         weather_processor = WeatherProcessor(self._weather_queue, (self._trips_queue, 0), self._results_monitor_queue)

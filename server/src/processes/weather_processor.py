@@ -4,14 +4,15 @@ import logging
 from ..communication_handlers.queue_communication_handler import QueueCommunicationHandler
 from ..counter import Counter
 from ..printing_counter import PrintingCounter
+from ..queues.rabb_prod_cons_queue import RabbProdConsQueue
 from ..utils.running_average import RunningAverage
 
 
 class WeatherProcessor:
     MIN_PRECTOT = 30
 
-    def __init__(self, data_queue, trips_queue_n_id_tuple, results_monitor_queue):
-        self._data_queue = data_queue
+    def __init__(self, _data_queue, trips_queue_n_id_tuple, results_monitor_queue):
+        self._data_queue = RabbProdConsQueue("WeatherData", None)
         self._days_that_rained_in_city = set()
         self._trips_queue = trips_queue_n_id_tuple[0]
         self._trips_queue_id = trips_queue_n_id_tuple[1]

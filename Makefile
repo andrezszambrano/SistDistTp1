@@ -16,9 +16,11 @@ build: deps
 .PHONY: build
 
 docker-image:
+	docker build -f ./rabbitmq/Dockerfile -t "rabbitmq:latest" .
+	docker build -f ./server/server_common/Dockerfile -t "base_python_image:latest" .
 	docker build -f ./server/Dockerfile -t "server:latest" .
+	docker build -f ./server/weather_processor/Dockerfile -t "weather_processor_image:latest" .
 	docker build -f ./client/Dockerfile -t "client:latest" .
-	#docker build -f ./tests/Dockerfile -t "server-test:latest" .
 
 	# Execute this command from time to time to clean up intermediate stages generated 
 	# during client build (your hard drive will like this :) ). Don't left uncommented if you 

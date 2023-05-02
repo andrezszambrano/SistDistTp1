@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import sys
 from configparser import ConfigParser
+from time import sleep
+
 from src.server import Server
+from src.rabbit_initializer import RabbitInitializer
 import logging
 import os
 
@@ -47,8 +50,12 @@ def main():
     logging.debug(f"action: config | result: success | port: {port} | "
                   f"listen_backlog: {listen_backlog} | logging_level: {logging_level}")
 
+    sleep(10)
+    rabbit_initializer = RabbitInitializer()
+    channel = rabbit_initializer.get_channel()
+
     # Initialize server and start server loop
-    server = Server(port, listen_backlog)
+    server = Server(port, listen_backlog, channel)
     server.run()
     sys.exit(0)
 

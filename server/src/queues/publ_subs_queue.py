@@ -1,5 +1,4 @@
-import logging
-from multiprocessing import SimpleQueue, Queue
+from multiprocessing import Queue
 
 from ..packet import Packet
 from ..packet_sender import PacketSender
@@ -16,5 +15,4 @@ class PublSubsQueue(PacketSender):
 
     def send(self, packet):
         for queue in self._queues.values():
-            #logging.debug(f"{queue.full()}")
             queue.put(packet.get_bytes())

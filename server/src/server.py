@@ -12,12 +12,13 @@ from .queues.prod_cons_queue import ProdConsQueue
 
 
 class Server:
-    def __init__(self, port, listen_backlog):
+    def __init__(self, port, listen_backlog, channel):
         # Initialize server socket
         self._client_sock = None
         self._port = port
         self._acceptor_socket = AcceptorSocket('', port, listen_backlog)
         self._client_processes = []
+        self._channel = channel
         self._prod_cons_queue = ProdConsQueue()
         self._results_monitor_queue = ProdConsQueue()
         self._query_queue = ProdConsQueue()
@@ -41,7 +42,7 @@ class Server:
         logging.debug(f"finished")
 
     def __create_and_run_data_distributer_process(self):
-        data_distributer = DataDistributer(self._prod_cons_queue, self._results_monitor_queue)
+        data_distributer = DataDistributer(self._prod_cons_queue, self._results_monitor_queue, self._channel)
         data_distributer_process = Process(target=data_distributer.run, args=(), daemon=False)
         data_distributer_process.start()
         return data_distributer_process

@@ -1,4 +1,4 @@
-FROM python:3.9.7-slim
+FROM base_python_image:latest
 RUN pip install haversine
 COPY server /
 COPY common/* /src/

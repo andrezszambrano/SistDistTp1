@@ -2,6 +2,13 @@ version: '3.9'
 name: tp1
 
 services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:latest
+    ports:
+      - 15672:15672
+    networks:
+      - testing_net
 
   server:
     container_name: server
@@ -17,6 +24,20 @@ services:
         source: ./server/config.ini
         target: /config/config.ini
         read_only: true
+
+  weather_processor:
+    container_name: weather_processor
+    image: weather_processor_image:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
 
   client:
     container_name: client
