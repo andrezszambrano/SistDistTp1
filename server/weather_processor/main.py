@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import signal
 import sys
+import traceback
 from configparser import ConfigParser
 from time import sleep
 
@@ -35,8 +37,12 @@ def initialize_config():
 
     return config_params
 
+def sigterm_handler(signum, frame):
+    # Clean up any resources and exit with code 0
+    sys.exit(0)
 
 def main():
+    signal.signal(signal.SIGTERM, sigterm_handler)
     config_params = initialize_config()
     logging_level = "INFO"#config_params["logging_level"]
 
@@ -47,12 +53,17 @@ def main():
 
     sleep(10)
 
+
     rabbit_initializer = RabbitInitializer()
     channel = rabbit_initializer.get_channel()
-
-    process = WeatherProcessor(channel)
-    process.run()
-    sys.exit(0)
+    try:
+        process = WeatherProcessor(channel)
+        process.run()
+    except Exception as _e:
+        logging.info(traceback.format_exc())
+    finally:
+        channel.close()
+        sys.exit(0)
 
 def initialize_log(logging_level):
     """

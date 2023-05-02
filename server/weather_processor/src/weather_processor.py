@@ -4,7 +4,7 @@ from .packet import Packet
 from .queue_communication_handler import QueueCommunicationHandler
 from .finalized_exception import FinalizedException
 from .rabb_prod_cons_queue import RabbProdConsQueue
-from .rabb_publ_subs_queue_recv import RabbPublSubsQueueRecv
+from .rabb_publ_subs_queue import RabbPublSubsQueue
 
 
 class WeatherProcessor:
@@ -48,7 +48,7 @@ class WeatherProcessor:
 
     def __recv_and_filter_trips_data(self):
         try:
-            trip_queue = RabbPublSubsQueueRecv(self._channel, "TripData", self.__process_trip_data)
+            trip_queue = RabbPublSubsQueue(self._channel, "TripData", self.__process_trip_data)
             trip_queue.start_recv_loop()
         except FinalizedException:
             logging.info(f"Finished receiving weather data")

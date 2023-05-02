@@ -10,7 +10,7 @@ from ..queues.prod_cons_queue import ProdConsQueue
 from ..queues.publ_subs_queue import PublSubsQueue
 from .weather_processor import WeatherProcessor
 from ..queues.rabb_prod_cons_queue import RabbProdConsQueue
-from ..queues.rabb_publ_subs_queue_sender import RabbPublSubsQueueSender
+from ..queues.rabb_publ_subs_queue import RabbPublSubsQueue
 
 
 class DataDistributer:
@@ -23,7 +23,7 @@ class DataDistributer:
         self._data_queue = data_queue
         self._weather_queue = RabbProdConsQueue(channel, "WeatherData", None)
         self._stations_queue = PublSubsQueue(self.AMOUNT_OF_STATIONS_SUBS)
-        self._trips_queue = RabbPublSubsQueueSender(channel, "TripData")
+        self._trips_queue = RabbPublSubsQueue(channel, "TripData")
         self._results_monitor_queue = results_monitor_queue
 
     def run(self):

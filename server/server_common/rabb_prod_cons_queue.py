@@ -1,5 +1,4 @@
 
-from .packet import Packet
 from .packet_sender import PacketSender
 
 
@@ -15,8 +14,6 @@ class RabbProdConsQueue(PacketSender):
     def start_recv_loop(self):
         self._channel.start_consuming()
 
-    def get_packet(self, _queue_id):
-        return Packet(self._queue.get())
 
     def send(self, packet):
         self._channel.basic_publish(exchange="", routing_key=self._queue_name, body=packet.get_bytes())
