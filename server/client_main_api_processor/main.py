@@ -3,7 +3,7 @@ import sys
 from configparser import ConfigParser
 from time import sleep
 
-from src.server import Server
+from src.client_main_api_processor import ClientMainApiProcessor
 from src.rabbit_initializer import RabbitInitializer
 import logging
 import os
@@ -39,7 +39,7 @@ def initialize_config():
 
 def main():
     config_params = initialize_config()
-    logging_level = config_params["logging_level"]
+    logging_level = "INFO"#config_params["logging_level"]
     port = config_params["port"]
     listen_backlog = config_params["listen_backlog"]
 
@@ -55,8 +55,8 @@ def main():
     channel = rabbit_initializer.get_channel()
 
     # Initialize server and start server loop
-    server = Server(port, listen_backlog, channel)
-    server.run()
+    client_main_api_processor = ClientMainApiProcessor(port, listen_backlog, channel)
+    client_main_api_processor.run()
     sys.exit(0)
 
 def initialize_log(logging_level):

@@ -18,7 +18,7 @@ build: deps
 docker-image:
 	docker build -f ./rabbitmq/Dockerfile -t "rabbitmq:latest" .
 	docker build -f ./server/server_common/Dockerfile -t "base_python_image:latest" .
-	docker build -f ./server/Dockerfile -t "server:latest" .
+	docker build -f ./server/client_main_api_processor/Dockerfile -t "client_main_api_processor:latest" .
 	docker build -f ./server/data_distributor_processor/Dockerfile -t "data_distributor_processor:latest" .
 	docker build -f ./server/weather_processor/Dockerfile -t "weather_processor_image:latest" .
 	docker build -f ./server/duplicated_processor/Dockerfile -t "duplicated_processor:latest" .

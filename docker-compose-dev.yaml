@@ -10,9 +10,9 @@ services:
     networks:
       - testing_net
 
-  server:
-    container_name: server
-    image: server:latest
+  client_main_api_processor:
+    container_name: client_main_api_processor
+    image: client_main_api_processor:latest
     entrypoint: python3 /main.py
     environment:
       - PYTHONUNBUFFERED=1
@@ -21,7 +21,7 @@ services:
       - testing_net
     volumes:
       - type: bind
-        source: ./server/config.ini
+        source: ./server/client_main_api_processor/config.ini
         target: /config/config.ini
         read_only: true
 
@@ -128,7 +128,7 @@ services:
         target: /config/config.ini
         read_only: true
     depends_on:
-      - server
+      - client_main_api_processor
       - query_processor
 
 volumes:

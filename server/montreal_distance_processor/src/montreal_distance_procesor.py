@@ -5,7 +5,6 @@ from haversine import haversine
 from .packet import Packet
 from .queue_communication_handler import QueueCommunicationHandler
 from .protocol import MONTREAL
-from .finalized_exception import FinalizedException
 from .rabb_prod_cons_queue import RabbProdConsQueue
 from .rabb_publ_subs_queue import RabbPublSubsQueue
 
