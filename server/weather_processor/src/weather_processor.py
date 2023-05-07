@@ -12,6 +12,7 @@ class WeatherProcessor:
     def __init__(self, channel1, channel2):
         self._channel1 = channel1
         self._channel2 = channel2
+        self._communication_receiver = QueueCommunicationHandler(None)
         self._days_that_rained_in_city = set()
 
     def run(self):
@@ -19,7 +20,7 @@ class WeatherProcessor:
         self.__recv_and_filter_trips_data()
 
     def __process_weather_data(self, _ch, _method, _properties, body):
-        weather_batch = self._weather_communication_handler.recv_weather_batch(Packet(body))
+        weather_batch = self._communication_receiver.recv_weather_batch(Packet(body))
         if weather_batch is None:
             self._channel1.stop_consuming()
             return
@@ -34,8 +35,7 @@ class WeatherProcessor:
         logging.info(f"Finished receiving weather data")
 
     def __process_trip_data(self, _ch, _method, _properties, body):
-        trip_communication_handler = QueueCommunicationHandler(None)
-        trip_batch = trip_communication_handler.recv_trip_batch(Packet(body))
+        trip_batch = self._communication_receiver.recv_trip_batch(Packet(body))
         if trip_batch is None:
             self._channel2.stop_consuming()
             return
@@ -59,7 +59,6 @@ class WeatherProcessor:
 
     def __initialize_queues_to_recv_weather(self):
         self._weather_queue = RabbProdConsQueue(self._channel1, "WeatherData", self.__process_weather_data)
-        self._weather_communication_handler = QueueCommunicationHandler(None)
 
     def __initialize_queues_to_recv_and_send_trips(self):
         self._trip_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__process_trip_data)
