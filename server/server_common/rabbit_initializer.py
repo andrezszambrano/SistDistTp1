@@ -2,8 +2,8 @@ import pika
 
 class RabbitInitializer:
     def __init__(self):
-        connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
-        self._channel = connection.channel()
+        self._connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
 
     def get_channel(self):
-        return self._channel
+        return self._connection.channel()
+

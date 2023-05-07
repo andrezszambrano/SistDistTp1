@@ -1,5 +1,6 @@
 import logging
 
+from .mutable_boolean import MutableBoolean
 from .packet import Packet
 from .printing_counter import PrintingCounter
 from .query_data import QueryData
@@ -21,11 +22,14 @@ class ResultMonitorProcessor:
 
     def __process_result_data(self, _ch, _method, _properties, body):
         action = self._result_monitor_communication_handler.recv_results_processor_action(Packet(body))
-        action.perform_action__(None, self._counter, self._query_results, self._query_communication_handler,
+        action.perform_action__(self._finished_boolean, self._counter, self._query_results, self._query_communication_handler,
                                 self._printing_counter)
+        if self._finished_boolean.get_boolean():
+            raise FinalizedException
 
     def run(self):
         try:
+            self._finished_boolean = MutableBoolean(False)
             self._results_monitor_queue.start_recv_loop()
         except FinalizedException:
             logging.info(f"Finished receiving weather data")

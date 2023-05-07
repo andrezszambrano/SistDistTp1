@@ -48,6 +48,7 @@ class MontrealDistanceProcessor:
             self._trip_queue.start_recv_loop()
         except FinalizedException:
             self._result_communication_handler.send_finished()
+            logging.info(f"Finished receiving trips data")
 
     def _filter_trip_batch(self, trip_batch):
         station_distance_occurrence_batch = []

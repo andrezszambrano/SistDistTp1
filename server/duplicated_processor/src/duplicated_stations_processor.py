@@ -39,6 +39,7 @@ class DuplicatedStationsProcessor:
             self._trip_queue.start_recv_loop()
         except FinalizedException:
             self._result_communication_handler.send_finished()
+            logging.info(f"Finished receiving trips data")
 
     def __process_trip_data(self, _ch, _method, _properties, body):
         trip_batch = self._communication_handler.recv_trip_batch(Packet(body))

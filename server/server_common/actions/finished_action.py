@@ -20,12 +20,12 @@ class FinishedAction(Action):
         trips_communication_handler.send_finished()
         raise FinalizedException()
 
-    def perform_action__(self, _finished_bool, counter, query_results, _query_communication_handler, printing_counter):
+    def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler, printing_counter):
         counter.increase()
         if counter.get() == 3:
             query_results.set_final_data()
             query_action = QueryAskAction()
-            query_action.perform_action__(_finished_bool, counter, query_results, _query_communication_handler, printing_counter)
+            query_action.perform_action__(finished_bool, counter, query_results, _query_communication_handler, printing_counter)
             printing_counter.print_final()
-            raise FinalizedException()
+            finished_bool.set(True)
         printing_counter.increase()
