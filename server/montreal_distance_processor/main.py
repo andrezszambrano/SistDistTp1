@@ -56,15 +56,14 @@ def main():
     sleep(10)
 
     rabbit_initializer = RabbitInitializer()
-    channel = rabbit_initializer.get_channel()
+    channel1 = rabbit_initializer.get_channel()
+    channel2 = rabbit_initializer.get_channel()
+
     try:
-        process = MontrealDistanceProcessor(channel)
+        process = MontrealDistanceProcessor(channel1, channel2)
         process.run()
     except Exception as _e:
         logging.info(traceback.format_exc())
-    finally:
-        channel.close()
-        sys.exit(0)
 
 def initialize_log(logging_level):
     """

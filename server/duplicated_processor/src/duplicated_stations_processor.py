@@ -10,7 +10,7 @@ class DuplicatedStationsProcessor:
     def __init__(self, channel1, channel2):
         self._channel1 = channel1
         self._channel2 = channel2
-        self._communication_handler = QueueCommunicationHandler(None)
+        self._communication_receiver = QueueCommunicationHandler(None)
         self._stations = {}
 
     def run(self):
@@ -18,7 +18,7 @@ class DuplicatedStationsProcessor:
         self._recv_and_filter_trips_data()
 
     def __process_station_data(self, _ch, _method, _properties, body):
-        station_batch = self._communication_handler.recv_station_batch(Packet(body))
+        station_batch = self._communication_receiver.recv_station_batch(Packet(body))
         if station_batch is None:
             self._channel1.stop_consuming()
             return
@@ -41,7 +41,7 @@ class DuplicatedStationsProcessor:
         logging.info(f"Finished receiving trips data")
 
     def __process_trip_data(self, _ch, _method, _properties, body):
-        trip_batch = self._communication_handler.recv_trip_batch(Packet(body))
+        trip_batch = self._communication_receiver.recv_trip_batch(Packet(body))
         if trip_batch is None:
             self._channel2.stop_consuming()
             return
