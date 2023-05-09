@@ -53,6 +53,20 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  years_filterer:
+    container_name: years_filterer
+    image: years_filterer:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
   duplicated_processor:
     container_name: duplicated_processor
     image: duplicated_processor:latest

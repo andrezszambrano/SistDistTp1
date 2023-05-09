@@ -23,8 +23,8 @@ class DuplicatedStationsProcessor:
             self._channel1.stop_consuming()
             return
         for station in station_batch:
-            if station.yearid in [2016, 2017]:
-                self._stations.update({(station.city_name, station.yearid, station.code): station.name})
+            #if station.yearid in [2016, 2017]:
+            self._stations.update({(station.city_name, station.yearid, station.code): station.name})
 
     def _recv_station_data(self):
         self.__initialize_queues_to_recv_stations()
@@ -51,19 +51,19 @@ class DuplicatedStationsProcessor:
         trips_in_2016_or_2017 = []
         for trip in trip_batch:
             year =  trip.start_date_time.date().year
-            if year in [2016, 2017]:
-                station_key = (trip.city_name, year, trip.start_station_code)
-                if station_key not in self._stations:
-                    continue
-                trips_in_2016_or_2017.append((year, trip.city_name, self._stations[station_key]))
+            #if year in [2016, 2017]:
+            station_key = (trip.city_name, year, trip.start_station_code)
+            if station_key not in self._stations:
+                continue
+            trips_in_2016_or_2017.append((year, trip.city_name, self._stations[station_key]))
         if len(trips_in_2016_or_2017) > 0:
             self._result_communication_handler.send_station_occurrence_batch(trips_in_2016_or_2017)
 
     def __initialize_queues_to_recv_stations(self):
-        self._station_queue = RabbPublSubsQueue(self._channel1, "StationData", self.__process_station_data)
+        self._station_queue = RabbPublSubsQueue(self._channel1, "2016-17Stations", self.__process_station_data)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        self._trip_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__process_trip_data)
+        self._trip_queue = RabbPublSubsQueue(self._channel2, "2016-17Trips", self.__process_trip_data)
         self._result_queue = RabbProdConsQueue(self._channel2, "ResultData")
         self._result_communication_handler = QueueCommunicationHandler(self._result_queue)
 

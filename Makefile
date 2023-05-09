@@ -23,6 +23,7 @@ docker-image:
 	docker build -f ./server/weather_processor/Dockerfile -t "weather_processor_image:latest" .
 	docker build -f ./server/montreal_filterer/Dockerfile -t "montreal_filterer:latest" .
 	docker build -f ./server/duplicated_processor/Dockerfile -t "duplicated_processor:latest" .
+		docker build -f ./server/years_filterer/Dockerfile -t "years_filterer:latest" .
 	docker build -f ./server/query_processor/Dockerfile -t "query_processor:latest" .
 	docker build -f ./server/result_processor/Dockerfile -t "result_processor:latest" .
 	docker build -f ./client/Dockerfile -t "client:latest" .
