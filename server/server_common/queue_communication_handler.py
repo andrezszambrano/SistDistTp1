@@ -15,6 +15,12 @@ class QueueCommunicationHandler:
         protocol.add_finished_to_packet(packet)
         self._queue.send(packet)
 
+    def send_station_finished(self):
+        packet = Packet()
+        protocol = ServerProtocol()
+        protocol.add_station_finished_to_packet(packet)
+        self._queue.send(packet)
+
     def send_data_to_distributer(self, data_type, data):
         packet = Packet()
         protocol = ServerProtocol()
@@ -40,12 +46,16 @@ class QueueCommunicationHandler:
         self._queue.send(packet)
 
     def send_batch_to_station_processes(self, station_batch):
+        if len(station_batch) == 0:
+            return
         packet = Packet()
         protocol = ServerProtocol()
         protocol.add_stations_batch_to_packet(packet, station_batch)
         self._queue.send(packet)
 
     def send_trip_batch_to_processes(self, trip_batch):
+        if len(trip_batch) == 0:
+            return
         packet = Packet()
         protocol = ServerProtocol()
         protocol.add_trip_batch_to_packet(packet, trip_batch)

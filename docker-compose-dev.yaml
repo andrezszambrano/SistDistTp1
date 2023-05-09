@@ -14,6 +14,7 @@ services:
     container_name: client_main_api_processor
     image: client_main_api_processor:latest
     entrypoint: python3 /main.py
+    restart: on-failure
     environment:
       - PYTHONUNBUFFERED=1
       - LOGGING_LEVEL=DEBUG
@@ -29,7 +30,6 @@ services:
     container_name: data_distributor_processor
     image: data_distributor_processor:latest
     entrypoint: python3 /main.py
-    #restart: on-failure
     depends_on:
       - rabbitmq
     networks:
@@ -81,6 +81,20 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+  montreal_filterer:
+    container_name: montreal_filterer
+    image: montreal_filterer:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+
   query_processor:
     container_name: query_processor
     image: query_processor:latest
@@ -113,6 +127,7 @@ services:
     container_name: client
     image: client:latest
     entrypoint: python3 /main.py
+    restart: on-failure
     environment:
       - CLI_ID=1
       - CLI_LOG_LEVEL=DEBUG

@@ -26,9 +26,10 @@ class MontrealDistanceProcessor:
             self._channel1.stop_consuming()
             return
         for station in station_batch:
-            if station.city_name == MONTREAL:
-                self._stations.update({(station.yearid, station.code): (station.name, station.latitude,
-                                                                        station.longitude)})
+            # if station.city_name == MONTREAL:
+            self._stations.update({(station.yearid, station.code): (station.name, station.latitude,
+                                                                    station.longitude)})
+
     def _recv_station_data(self):
         self.__initialize_queues_to_recv_stations()
         self._station_queue.start_recv_loop()
@@ -52,8 +53,8 @@ class MontrealDistanceProcessor:
     def _filter_trip_batch(self, trip_batch):
         station_distance_occurrence_batch = []
         for trip in trip_batch:
-            if trip.city_name != MONTREAL:
-                continue
+            # if trip.city_name != MONTREAL:
+            #    continue
             starting_key = (trip.yearid, trip.start_station_code)
             ending_key = (trip.yearid, trip.end_station_code)
             if (starting_key not in self._stations) or (ending_key not in self._stations):
@@ -73,10 +74,9 @@ class MontrealDistanceProcessor:
         return haversine((starting_latitude, starting_longitude), (ending_latitude, ending_longitude))
 
     def __initialize_queues_to_recv_stations(self):
-        self._station_queue = RabbPublSubsQueue(self._channel1, "StationData", self.__process_station_data)
+        self._station_queue = RabbPublSubsQueue(self._channel1, "MontrealStations", self.__process_station_data)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        self._trip_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__process_trip_data)
-        self._result_queue = RabbProdConsQueue(self._channel2, "ResultData")
-        self._result_communication_handler = QueueCommunicationHandler(self._result_queue)
-
+        self._trip_queue = RabbPublSubsQueue(self._channel2, "MontrealTrips", self.__process_trip_data)
+        result_queue = RabbProdConsQueue(self._channel2, "ResultData")
+        self._result_communication_handler = QueueCommunicationHandler(result_queue)

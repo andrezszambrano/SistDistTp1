@@ -21,11 +21,12 @@ docker-image:
 	docker build -f ./server/client_main_api_processor/Dockerfile -t "client_main_api_processor:latest" .
 	docker build -f ./server/data_distributor_processor/Dockerfile -t "data_distributor_processor:latest" .
 	docker build -f ./server/weather_processor/Dockerfile -t "weather_processor_image:latest" .
+	docker build -f ./server/montreal_filterer/Dockerfile -t "montreal_filterer:latest" .
 	docker build -f ./server/duplicated_processor/Dockerfile -t "duplicated_processor:latest" .
-	docker build -f ./server/montreal_distance_processor/Dockerfile -t "montreal_distance_processor:latest" .
 	docker build -f ./server/query_processor/Dockerfile -t "query_processor:latest" .
 	docker build -f ./server/result_processor/Dockerfile -t "result_processor:latest" .
 	docker build -f ./client/Dockerfile -t "client:latest" .
+	docker build -f ./server/montreal_distance_processor/Dockerfile -t "montreal_distance_processor:latest" .
 
 	# Execute this command from time to time to clean up intermediate stages generated 
 	# during client build (your hard drive will like this :) ). Don't left uncommented if you 
