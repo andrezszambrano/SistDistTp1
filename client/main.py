@@ -55,7 +55,7 @@ def main():
     logging.debug(f"action: config | result: success | "
                   f"server_address: {server_address} | log_level: {logging_level}")
 
-    sleep(15)
+    sleep(20)
 
     # Initialize client
     client = Client(server_address, query_address)

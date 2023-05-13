@@ -191,7 +191,6 @@ class ServerProtocol(Protocol):
 
     def recv_station_batch_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
-        logging.info(f"{message_type}")
         if message_type == super().STATION_FINISHED:
             return None
         return self.__recv_station_batch(byte_stream)
