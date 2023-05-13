@@ -60,7 +60,6 @@ def main():
     # Initialize client
     client = Client(server_address, query_address)
     client.run()
-    sys.exit(0)
 
 def initialize_log(logging_level):
     """

@@ -6,7 +6,7 @@ import pika
 
 class RabbitInitializer:
     DELAY_BETWEEN_ATTEMPTS = 4
-    MAX_ATTEMPTS = 3
+    MAX_ATTEMPTS = 5
 
     def __init__(self):
         attempts = 0

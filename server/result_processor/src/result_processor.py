@@ -6,12 +6,12 @@ from .printing_counter import PrintingCounter
 from .query_data import QueryData
 from .queue_communication_handler import QueueCommunicationHandler
 from .rabb_prod_cons_queue import RabbProdConsQueue
-from .finalized_exception import FinalizedException
 from .counter import Counter
 
 
 class ResultMonitorProcessor:
     def __init__(self, channel):
+        self._channel = channel
         self._results_monitor_queue = RabbProdConsQueue(channel, "ResultData", self.__process_result_data)
         self._result_monitor_communication_handler = QueueCommunicationHandler(None)
         self._printing_counter = PrintingCounter("Registered in result", 10000)
@@ -25,12 +25,11 @@ class ResultMonitorProcessor:
         action.perform_action__(self._finished_boolean, self._counter, self._query_results, self._query_communication_handler,
                                 self._printing_counter)
         if self._finished_boolean.get_boolean():
-            raise FinalizedException
+            self._channel.stop_consuming()
 
     def run(self):
-        try:
-            self._finished_boolean = MutableBoolean(False)
-            self._results_monitor_queue.start_recv_loop()
-        except FinalizedException:
-            logging.info(f"Finished receiving weather data")
+        self._finished_boolean = MutableBoolean(False)
+        self._results_monitor_queue.start_recv_loop()
+        self._channel.close()
+        logging.info(f"Finished receiving weather data")
 

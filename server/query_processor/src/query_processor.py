@@ -6,11 +6,11 @@ from .acceptor_socket import AcceptorSocket
 from .queue_communication_handler import QueueCommunicationHandler
 from .socket_communication_handler import SocketCommunicationHandler
 from .rabb_prod_cons_queue import RabbProdConsQueue
-from .finalized_exception import FinalizedException
 
 
 class QueryProcessor:
     def __init__(self, port, channel):
+        self._channel = channel
         ask_results_queue = RabbProdConsQueue(channel, "ResultData")
         self._ask_results_communication_handler = QueueCommunicationHandler(ask_results_queue)
         self._query_result_queue = RabbProdConsQueue(channel, "QueryData", self.__process_query_data)
@@ -21,21 +21,19 @@ class QueryProcessor:
 
     def __process_query_data(self, _ch, _method, _properties, body):
         query_data = self._query_result_communication_handler.recv_query_data(Packet(body))
-        logging.info(f"{query_data}")
         query_result = self.__transform_query_data_in_result(query_data)
         self._client_communicator_handler.send_query_results(query_result)
         if query_result.final_result:
-            raise FinalizedException()
+            self._channel.stop_consuming()
+            return
         self._client_communicator_handler.recv_query_ask()
         self._ask_results_communication_handler.send_query_ask()
 
     def run(self):
-        try:
-            self._client_communicator_handler.recv_query_ask()
-            self._ask_results_communication_handler.send_query_ask()
-            self._query_result_queue.start_recv_loop()
-        except FinalizedException:
-            pass
+        self._client_communicator_handler.recv_query_ask()
+        self._ask_results_communication_handler.send_query_ask()
+        self._query_result_queue.start_recv_loop()
+        self._channel.close()
 
     def __transform_query_data_in_result(self, query_data):
         rainy_date_n_avg_list = self.__parse_date_to_duration_avg_dict_to_list(query_data.date_to_duration_avg)
