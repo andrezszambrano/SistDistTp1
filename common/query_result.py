@@ -1,5 +1,7 @@
 import logging
+import datetime
 
+RESULTS_PATH = "/results/result.txt"
 
 class QueryResult:
     def __init__(self, rainy_date_n_avg_list, station_that_doubled_list, far_away_station_list, final_result):
@@ -25,6 +27,8 @@ class QueryResult:
         self.__append_far_away_stations_query(to_print_vec)
         to_print = "\n".join(to_print_vec)
         logging.info(f"{to_print}")
+        if self.final_result:
+            self.__save_final_result(to_print)
 
     def __append_final_or_partial_result(self, to_print_vec):
         if self.final_result:
@@ -85,3 +89,10 @@ class QueryResult:
                 to_append.append(f"\t\tName: {station_distance2[0]}, avg distance: {station_distance2[1]}")
             to_print_vec.extend(to_append)
         to_print_vec.append(f"\t{len(self.far_away_station_list)} rows")
+
+    def __save_final_result(self, to_write):
+        with open(RESULTS_PATH, 'w') as file:
+            current_time = datetime.datetime.now()
+            file.write(f'{current_time}')
+            file.write(to_write)
+            file.close()

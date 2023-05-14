@@ -151,11 +151,11 @@ services:
       - type: bind
         source: ./data/archive
         target: /data
-        read_only: true
       - type: bind
         source: ./client/config.ini
         target: /config/config.ini
         read_only: true
+      - results:/results
     depends_on:
       - client_main_api_processor
       - query_processor
@@ -167,6 +167,7 @@ volumes:
     external: false
   dataset:
     external: false
+  results:
 
 networks:
   testing_net:
