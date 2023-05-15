@@ -3,13 +3,13 @@ from .packet_sender import PacketSender
 
 
 class RabbProdConsQueue(PacketSender):
-    def __init__(self, channel, queue_name, callback=None):
+    def __init__(self, rabbit_channel_wrapper, queue_name, callback=None):
         super(RabbProdConsQueue, self).__init__()
-        self._channel = channel
+        self._channel = rabbit_channel_wrapper.channel
         self._channel.queue_declare(queue=queue_name)
         self._queue_name = queue_name
         if callback is not None:
-            channel.basic_consume(queue=self._queue_name, on_message_callback=callback, auto_ack=True)
+            self._channel.basic_consume(queue=self._queue_name, on_message_callback=callback, auto_ack=True)
 
     def start_recv_loop(self):
         self._channel.start_consuming()

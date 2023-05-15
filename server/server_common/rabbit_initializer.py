@@ -3,6 +3,8 @@ import time
 
 import pika
 
+from .rabbit_channel import RabbitChannel
+
 
 class RabbitInitializer:
     DELAY_BETWEEN_ATTEMPTS = 4
@@ -20,4 +22,4 @@ class RabbitInitializer:
                 attempts += 1
 
     def get_channel(self):
-        return self._connection.channel()
+        return RabbitChannel(self._connection.channel())
