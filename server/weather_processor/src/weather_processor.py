@@ -1,4 +1,5 @@
 import logging
+import signal
 
 from .packet import Packet
 from .queue_communication_handler import QueueCommunicationHandler
@@ -13,7 +14,20 @@ class WeatherProcessor:
         self._channel1 = channel1
         self._channel2 = channel2
         self._communication_receiver = QueueCommunicationHandler(None)
+        self.__initialize_queues_to_recv_weather()
+        self.__initialize_queues_to_recv_and_send_trips()
         self._days_that_rained_in_city = set()
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
+
+    def __exit_gracefully(self, _signum, _frame):
+        logging.info("Exiting gracefully")
+        self._weather_recv_communication_handler.close()
+        self._trips_recv_communication_handler.close()
+        self._result_sender_communication_handler.close()
+        self._channel1.stop_consuming()
+        self._channel1.close()
+        self._channel2.stop_consuming()
+        self._channel2.close()
 
     def run(self):
         self.__recv_weather_data()
@@ -29,8 +43,7 @@ class WeatherProcessor:
                 self._days_that_rained_in_city.add((weather.city_name, weather.date))
 
     def __recv_weather_data(self):
-        self.__initialize_queues_to_recv_weather()
-        self._weather_queue.start_recv_loop()
+        self._weather_recv_communication_handler.start_consuming()
         self._channel1.close()
         logging.info(f"Finished receiving weather data")
 
@@ -42,9 +55,8 @@ class WeatherProcessor:
         self.__filter_trip_batch(trip_batch)
 
     def __recv_and_filter_trips_data(self):
-        self.__initialize_queues_to_recv_and_send_trips()
-        self._trip_queue.start_recv_loop()
-        self._result_communication_handler.send_finished()
+        self._trips_recv_communication_handler.start_consuming()
+        self._result_sender_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data")
 
@@ -55,13 +67,15 @@ class WeatherProcessor:
             if (trip.city_name, date) in self._days_that_rained_in_city:
                 rainy_trips_duration_batch.append((date, trip.duration_sec))
         if len(rainy_trips_duration_batch) > 0:
-            self._result_communication_handler.send_rainy_trip_duration_batch(rainy_trips_duration_batch)
+            self._result_sender_communication_handler.send_rainy_trip_duration_batch(rainy_trips_duration_batch)
 
     def __initialize_queues_to_recv_weather(self):
-        self._weather_queue = RabbProdConsQueue(self._channel1, "WeatherData", self.__process_weather_data)
+        weather_queue = RabbProdConsQueue(self._channel1, "WeatherData", self.__process_weather_data)
+        self._weather_recv_communication_handler = QueueCommunicationHandler(weather_queue)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        self._trip_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__process_trip_data)
-        self._result_queue = RabbProdConsQueue(self._channel2, "ResultData")
-        self._result_communication_handler = QueueCommunicationHandler(self._result_queue)
+        trips_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__process_trip_data)
+        self._trips_recv_communication_handler = QueueCommunicationHandler(trips_queue)
+        result_queue = RabbProdConsQueue(self._channel2, "ResultData")
+        self._result_sender_communication_handler = QueueCommunicationHandler(result_queue)
 
