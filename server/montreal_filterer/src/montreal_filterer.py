@@ -18,8 +18,8 @@ class MontrealFilterer:
 
     def __recv_and_filter_station_data(self):
         self.__initialize_queues_to_recv_stations()
-        self._station_queue.start_recv_loop()
-        self._station_communication_handler.send_station_finished()
+        self._station_recv_communication_handler.start_consuming()
+        self._station_sender_communication_handler.send_station_finished()
         self._channel1.close()
         logging.info(f"Finished receiving station data")
 
@@ -32,17 +32,18 @@ class MontrealFilterer:
         for station in station_batch:
             if station.city_name == MONTREAL:
                 filtered_stations.append(station)
-        self._station_communication_handler.send_batch_to_station_processes(filtered_stations)
+        self._station_sender_communication_handler.send_batch_to_station_processes(filtered_stations)
 
     def __initialize_queues_to_recv_stations(self):
-        self._station_queue = RabbPublSubsQueue(self._channel1, "StationData", self.__filter_station_data)
+        station_queue = RabbPublSubsQueue(self._channel1, "StationData", self.__filter_station_data)
+        self._station_recv_communication_handler = QueueCommunicationHandler(station_queue)
         filtered_stations_queue = RabbPublSubsQueue(self._channel1, "MontrealStations")
-        self._station_communication_handler = QueueCommunicationHandler(filtered_stations_queue)
+        self._station_sender_communication_handler = QueueCommunicationHandler(filtered_stations_queue)
 
     def __recv_and_filter_trips_data(self):
         self.__initialize_queues_to_recv_and_send_trips()
-        self._trip_queue.start_recv_loop()
-        self._trips_communication_handler.send_finished()
+        self._trips_recv_communication_handler.start_consuming()
+        self._trips_sender_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data")
 
@@ -55,9 +56,10 @@ class MontrealFilterer:
         for trip in trip_batch:
             if trip.city_name == MONTREAL:
                 filtered_trips.append(trip)
-        self._trips_communication_handler.send_trip_batch_to_processes(filtered_trips)
+        self._trips_sender_communication_handler.send_trip_batch_to_processes(filtered_trips)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        self._trip_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__filter_trip_data)
+        trip_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__filter_trip_data)
+        self._trips_recv_communication_handler = QueueCommunicationHandler(trip_queue)
         filtered_trips_queue = RabbPublSubsQueue(self._channel2, "MontrealTrips")
-        self._trips_communication_handler = QueueCommunicationHandler(filtered_trips_queue)
+        self._trips_sender_communication_handler = QueueCommunicationHandler(filtered_trips_queue)

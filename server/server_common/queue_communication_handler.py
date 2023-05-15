@@ -98,3 +98,6 @@ class QueueCommunicationHandler:
 
     def recv_query_data(self, packet):
         return self._server_protocol.recv_query_data(packet)
+
+    def start_consuming(self):
+        self._queue.start_recv_loop()
