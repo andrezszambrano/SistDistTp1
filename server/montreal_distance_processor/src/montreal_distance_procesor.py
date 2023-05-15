@@ -1,4 +1,5 @@
 import logging
+import signal
 
 from haversine import haversine
 
@@ -15,6 +16,19 @@ class MontrealDistanceProcessor:
         self._channel2 = channel2
         self._communication_receiver = QueueCommunicationHandler(None)
         self._stations = {}
+        self.__initialize_queues_to_recv_stations()
+        self.__initialize_queues_to_recv_and_send_trips()
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
+
+    def __exit_gracefully(self, _signum, _frame):
+        logging.info("Exiting gracefully")
+        self._station_recv_communication_handler.close()
+        self._trips_recv_communication_handler.close()
+        self._result_communication_handler.close()
+        self._channel1.stop_consuming()
+        self._channel1.close()
+        self._channel2.stop_consuming()
+        self._channel2.close()
 
     def run(self):
         self._recv_station_data()
@@ -26,13 +40,11 @@ class MontrealDistanceProcessor:
             self._channel1.stop_consuming()
             return
         for station in station_batch:
-            # if station.city_name == MONTREAL:
             self._stations.update({(station.yearid, station.code): (station.name, station.latitude,
                                                                     station.longitude)})
 
     def _recv_station_data(self):
-        self.__initialize_queues_to_recv_stations()
-        self._station_queue.start_recv_loop()
+        self._station_recv_communication_handler.start_consuming()
         self._channel1.close()
         logging.info(f"Finished receiving station data")
 
@@ -44,8 +56,7 @@ class MontrealDistanceProcessor:
         self._filter_trip_batch(trip_batch)
 
     def _recv_and_filter_trips_data(self):
-        self.__initialize_queues_to_recv_and_send_trips()
-        self._trip_queue.start_recv_loop()
+        self._trips_recv_communication_handler.start_consuming()
         self._result_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data")
@@ -53,8 +64,6 @@ class MontrealDistanceProcessor:
     def _filter_trip_batch(self, trip_batch):
         station_distance_occurrence_batch = []
         for trip in trip_batch:
-            # if trip.city_name != MONTREAL:
-            #    continue
             starting_key = (trip.yearid, trip.start_station_code)
             ending_key = (trip.yearid, trip.end_station_code)
             if (starting_key not in self._stations) or (ending_key not in self._stations):
@@ -74,9 +83,11 @@ class MontrealDistanceProcessor:
         return haversine((starting_latitude, starting_longitude), (ending_latitude, ending_longitude))
 
     def __initialize_queues_to_recv_stations(self):
-        self._station_queue = RabbPublSubsQueue(self._channel1, "MontrealStations", self.__process_station_data)
+        station_queue = RabbPublSubsQueue(self._channel1, "MontrealStations", self.__process_station_data)
+        self._station_recv_communication_handler = QueueCommunicationHandler(station_queue)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        self._trip_queue = RabbPublSubsQueue(self._channel2, "MontrealTrips", self.__process_trip_data)
+        trips_queue = RabbPublSubsQueue(self._channel2, "MontrealTrips", self.__process_trip_data)
+        self._trips_recv_communication_handler = QueueCommunicationHandler(trips_queue)
         result_queue = RabbProdConsQueue(self._channel2, "ResultData")
         self._result_communication_handler = QueueCommunicationHandler(result_queue)
