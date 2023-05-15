@@ -1,4 +1,5 @@
 import logging
+import signal
 
 from .packet import Packet
 from .queue_communication_handler import QueueCommunicationHandler
@@ -12,6 +13,19 @@ class DuplicatedStationsProcessor:
         self._channel2 = channel2
         self._communication_receiver = QueueCommunicationHandler(None)
         self._stations = {}
+        self.__initialize_queues_to_recv_stations()
+        self.__initialize_queues_to_recv_and_send_trips()
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
+
+    def __exit_gracefully(self, _signum, _frame):
+        logging.info("Exiting gracefully")
+        self._station_recv_communication_handler.close()
+        self._trips_recv_communication_handler.close()
+        self._result_sender_communication_handler.close()
+        self._channel1.stop_consuming()
+        self._channel1.close()
+        self._channel2.stop_consuming()
+        self._channel2.close()
 
     def run(self):
         self._recv_station_data()
@@ -26,16 +40,14 @@ class DuplicatedStationsProcessor:
             self._stations.update({(station.city_name, station.yearid, station.code): station.name})
 
     def _recv_station_data(self):
-        self.__initialize_queues_to_recv_stations()
-        self._station_queue.start_recv_loop()
+        self._station_recv_communication_handler.start_consuming()
         self._channel1.close()
         logging.info(f"Finished receiving station data")
 
 
     def _recv_and_filter_trips_data(self):
-        self.__initialize_queues_to_recv_and_send_trips()
-        self._trip_queue.start_recv_loop()
-        self._result_communication_handler.send_finished()
+        self._trips_recv_communication_handler.start_consuming()
+        self._result_sender_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data")
 
@@ -54,13 +66,14 @@ class DuplicatedStationsProcessor:
             if station_key not in self._stations:
                 continue
             trips_in_2016_or_2017.append((year, trip.city_name, self._stations[station_key]))
-        self._result_communication_handler.send_station_occurrence_batch(trips_in_2016_or_2017)
+        self._result_sender_communication_handler.send_station_occurrence_batch(trips_in_2016_or_2017)
 
     def __initialize_queues_to_recv_stations(self):
-        self._station_queue = RabbPublSubsQueue(self._channel1, "2016-17Stations", self.__process_station_data)
+        station_queue = RabbPublSubsQueue(self._channel1, "2016-17Stations", self.__process_station_data)
+        self._station_recv_communication_handler = QueueCommunicationHandler(station_queue)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        self._trip_queue = RabbPublSubsQueue(self._channel2, "2016-17Trips", self.__process_trip_data)
+        trips_queue = RabbPublSubsQueue(self._channel2, "2016-17Trips", self.__process_trip_data)
+        self._trips_recv_communication_handler = QueueCommunicationHandler(trips_queue)
         self._result_queue = RabbProdConsQueue(self._channel2, "ResultData")
-        self._result_communication_handler = QueueCommunicationHandler(self._result_queue)
-
+        self._result_sender_communication_handler = QueueCommunicationHandler(self._result_queue)

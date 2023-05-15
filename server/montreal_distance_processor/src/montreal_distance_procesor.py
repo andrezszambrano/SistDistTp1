@@ -24,7 +24,7 @@ class MontrealDistanceProcessor:
         logging.info("Exiting gracefully")
         self._station_recv_communication_handler.close()
         self._trips_recv_communication_handler.close()
-        self._result_communication_handler.close()
+        self._result_sender_communication_handler.close()
         self._channel1.stop_consuming()
         self._channel1.close()
         self._channel2.stop_consuming()
@@ -57,7 +57,7 @@ class MontrealDistanceProcessor:
 
     def _recv_and_filter_trips_data(self):
         self._trips_recv_communication_handler.start_consuming()
-        self._result_communication_handler.send_finished()
+        self._result_sender_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data")
 
@@ -73,7 +73,7 @@ class MontrealDistanceProcessor:
             distance = self.__calculate_distance_betwee_stations(starting_station_data, ending_station_data)
             station_distance_occurrence_batch.append((trip.yearid, ending_station_data[0], distance))
         if len(station_distance_occurrence_batch) > 0:
-            self._result_communication_handler.send_station_distance_occurrence_batch(station_distance_occurrence_batch)
+            self._result_sender_communication_handler.send_station_distance_occurrence_batch(station_distance_occurrence_batch)
 
     def __calculate_distance_betwee_stations(self, starting_station_data, ending_station_data):
         starting_latitude = starting_station_data[1]
@@ -90,4 +90,4 @@ class MontrealDistanceProcessor:
         trips_queue = RabbPublSubsQueue(self._channel2, "MontrealTrips", self.__process_trip_data)
         self._trips_recv_communication_handler = QueueCommunicationHandler(trips_queue)
         result_queue = RabbProdConsQueue(self._channel2, "ResultData")
-        self._result_communication_handler = QueueCommunicationHandler(result_queue)
+        self._result_sender_communication_handler = QueueCommunicationHandler(result_queue)
