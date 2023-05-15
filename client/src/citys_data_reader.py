@@ -1,4 +1,5 @@
 import logging
+import signal
 from datetime import datetime, timedelta
 
 from .chunk_file_reader import ChunkFileReader
@@ -45,8 +46,14 @@ class CityDataReader:
     def __init__(self, city_name, queue):
         self._city_name = city_name
         self._queue = queue
+        self._keep_sending = True
+
+    def __exit_gracefully(self, _signum, _frame):
+        self._queue.cancel_join_thread()
+        self._keep_sending = False
 
     def run(self):
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
         weather_chunk_generator = ChunkFileReader(f"{DATA_PATH}{self._city_name}/{WEATHER}", KB_50,
                                                   row_to_weather_obj, self._city_name)
         self.__send_chunks(weather_chunk_generator, WEATHER_DATA, WEATHER_FINISHED)
@@ -63,5 +70,7 @@ class CityDataReader:
 
     def __send_chunks(self, chunk_generator, data_type, finished_char):
         for chunk in chunk_generator.get_chunks():
+            if not self._keep_sending:
+                return
             self._queue.put((data_type, chunk))
         self._queue.put(finished_char)

@@ -1,4 +1,5 @@
 import logging
+import signal
 import time
 
 from .client_communication_handler import ClientCommunicationHandler
@@ -9,22 +10,27 @@ from .socket_wrapper import Socket
 class QueryAsker:
     MAX_ATTEMPTS = 50
     DELAY_BETWEEN_ATTEMPTS = 4
-    WAIT = 10
+    WAIT = 5
 
     def __init__(self, server_address):
         self._host, _port = server_address.split(':')
         self._port = int(_port)
         logging.info(f"{self._host}:{self._port}")
+        self._finished_bool = MutableBoolean(False)
+
+    def __exit_gracefully(self, _signum, _frame):
+        self._finished_bool.set(True)
 
     def run(self):
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
         socket = self._connect()
-        finished_bool = MutableBoolean(False)
         communication_handler = ClientCommunicationHandler(socket)
-        while not finished_bool.get_boolean():
+        while not self._finished_bool.get_boolean():
             time.sleep(self.WAIT)
             query_result = communication_handler.get_query_results()
             query_result.print()
-            finished_bool.set(query_result.final_result)
+            self._finished_bool.set(query_result.final_result or self._finished_bool.get_boolean())
+        socket.shutdown_and_close()
 
     def _connect(self):
         attempts = 0

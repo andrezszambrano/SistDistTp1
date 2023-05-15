@@ -1,4 +1,5 @@
 import logging
+import signal
 
 from .client_communication_handler import ClientCommunicationHandler
 from .socket_wrapper import Socket
@@ -15,18 +16,22 @@ class Sender:
         host, _port = server_address.split(':')
         port = int(_port)
         self._socket = Socket(host, port)
+        self._keep_receiving = True
 
-    def send_data(self, queue):
+    def __exit_gracefully(self, _signum, _frame):
+        self._keep_receiving = False
+
+    def run(self, queue):
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
         counter = 0
         weather_finished_counter = 0
         station_finished_counter = 0
-        keep_receiving = True
         communication_handler = ClientCommunicationHandler(self._socket)
-        while keep_receiving:
+        while self._keep_receiving:
             data = queue.get()
             if data[0] == FINISHED:
                 counter = counter + 1
-                keep_receiving = not (counter == 3)
+                self._keep_receiving = not (counter == 3)
             elif data[0] == WEATHER_FINISHED:
                 weather_finished_counter = weather_finished_counter + 1
                 if weather_finished_counter == 3:
