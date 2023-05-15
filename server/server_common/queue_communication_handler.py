@@ -5,6 +5,7 @@ from .server_protocol import ServerProtocol
 
 
 class QueueCommunicationHandler:
+
     def __init__(self, queue):
         self._queue = queue
         self._server_protocol = ServerProtocol()
@@ -98,6 +99,9 @@ class QueueCommunicationHandler:
 
     def recv_query_data(self, packet):
         return self._server_protocol.recv_query_data(packet)
+
+    def close(self):
+        self._queue.close()
 
     def start_consuming(self):
         self._queue.start_recv_loop()

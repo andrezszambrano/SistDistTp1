@@ -16,11 +16,10 @@ class Client:
 
     def __exit_gracefully(self, _signum, _frame):
         logging.info("Exiting gracefully")
-        if self._query_asker_process is not None:
-            self._query_asker_process.terminate()
-            self._sender_process.terminate()
-            for city_readers_process in self._city_readers_processes:
-                city_readers_process.terminate()
+        self._query_asker_process.terminate()
+        self._sender_process.terminate()
+        for city_readers_process in self._city_readers_processes:
+            city_readers_process.terminate()
 
     def run(self):
         queue = Queue()

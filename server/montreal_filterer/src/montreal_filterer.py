@@ -1,23 +1,36 @@
 import logging
+import signal
 
 from .packet import Packet
 from .queue_communication_handler import QueueCommunicationHandler
 from .protocol import MONTREAL
-from .rabb_prod_cons_queue import RabbProdConsQueue
 from .rabb_publ_subs_queue import RabbPublSubsQueue
 
 class MontrealFilterer:
     def __init__(self, channel1, channel2):
         self._channel1 = channel1
         self._channel2 = channel2
+        self.__initialize_queues_to_recv_stations()
+        self.__initialize_queues_to_recv_and_send_trips()
         self._communication_receiver = QueueCommunicationHandler(None)
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
+
+    def __exit_gracefully(self, _signum, _frame):
+        logging.info("Exiting gracefully")
+        self._station_sender_communication_handler.close()
+        self._station_recv_communication_handler.close()
+        self._trips_recv_communication_handler.close()
+        self._trips_sender_communication_handler.close()
+        self._channel1.stop_consuming()
+        self._channel1.close()
+        self._channel2.stop_consuming()
+        self._channel2.close()
 
     def run(self):
         self.__recv_and_filter_station_data()
         self.__recv_and_filter_trips_data()
 
     def __recv_and_filter_station_data(self):
-        self.__initialize_queues_to_recv_stations()
         self._station_recv_communication_handler.start_consuming()
         self._station_sender_communication_handler.send_station_finished()
         self._channel1.close()
@@ -41,7 +54,6 @@ class MontrealFilterer:
         self._station_sender_communication_handler = QueueCommunicationHandler(filtered_stations_queue)
 
     def __recv_and_filter_trips_data(self):
-        self.__initialize_queues_to_recv_and_send_trips()
         self._trips_recv_communication_handler.start_consuming()
         self._trips_sender_communication_handler.send_finished()
         self._channel2.close()

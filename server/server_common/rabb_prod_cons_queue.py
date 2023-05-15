@@ -8,11 +8,17 @@ class RabbProdConsQueue(PacketSender):
         self._channel = rabbit_channel_wrapper.channel
         self._channel.queue_declare(queue=queue_name)
         self._queue_name = queue_name
+        self._closed = False
         if callback is not None:
             self._channel.basic_consume(queue=self._queue_name, on_message_callback=callback, auto_ack=True)
 
     def start_recv_loop(self):
-        self._channel.start_consuming()
+        if not self._closed:
+            self._channel.start_consuming()
 
     def send(self, packet):
-        self._channel.basic_publish(exchange="", routing_key=self._queue_name, body=packet.get_bytes())
+        if not self._closed:
+            self._channel.basic_publish(exchange="", routing_key=self._queue_name, body=packet.get_bytes())
+
+    def close(self):
+        self._closed = True
