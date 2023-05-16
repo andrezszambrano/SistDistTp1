@@ -31,3 +31,5 @@ make docker-compose-stop
 
 On the first terminal, all processes should exit with 0 code. Same goes when the application ends successfully.
 
+
+Note: when the an accepting node (client_main_api or query_processor) is accepting the connection and it receives a sigterm, I could not handle the exception in a good fashion so those nodes do not end gracefully.
