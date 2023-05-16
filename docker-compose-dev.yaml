@@ -51,6 +51,7 @@ services:
     links:
       - rabbitmq
     environment:
+      - INSTANCE_ID=1
       - PYTHONUNBUFFERED=1
 
   years_filterer:

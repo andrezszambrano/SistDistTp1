@@ -6,6 +6,7 @@ from .packet import Packet
 from .queue_communication_handler import QueueCommunicationHandler
 from .rabb_prod_cons_queue import RabbProdConsQueue
 from .rabb_publ_subs_queue import RabbPublSubsQueue
+from .rabb_list_prod_cons_queue import RabbListProdConsQueue
 
 
 class DataDistributor:
@@ -17,9 +18,9 @@ class DataDistributor:
     def __init__(self, channel):
         self._channel = channel
         data_queue = RabbProdConsQueue(channel, "AllData", self.__process_data)
-        weather_queue = RabbProdConsQueue(channel, "WeatherData")
+        weather_queue = RabbPublSubsQueue(channel, "WeatherData")
         station_queue = RabbPublSubsQueue(channel, "StationData")
-        trips_queue = RabbPublSubsQueue(channel, "TripData")
+        trips_queue = RabbListProdConsQueue(channel, ["TripDataQuery1", "TripDataQuery2", "TripDataQuery3"])
         self._finished_bool = MutableBoolean(False)
         self._server_communication_handler = QueueCommunicationHandler(data_queue)
         self._weather_communication_handler = QueueCommunicationHandler(weather_queue)

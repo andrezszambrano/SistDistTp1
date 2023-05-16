@@ -1,20 +1,21 @@
+import datetime
 import logging
 import signal
 
 from .packet import Packet
 from .queue_communication_handler import QueueCommunicationHandler
-from .rabb_prod_cons_queue import RabbProdConsQueue
 from .rabb_publ_subs_queue import RabbPublSubsQueue
+from .rabb_prod_cons_queue import RabbProdConsQueue
 
 
 class WeatherProcessor:
     MIN_PRECTOT = 30
 
-    def __init__(self, channel1, channel2):
+    def __init__(self, instance_id, channel1, channel2):
         self._channel1 = channel1
         self._channel2 = channel2
         self._communication_receiver = QueueCommunicationHandler(None)
-        self.__initialize_queues_to_recv_weather()
+        self.__initialize_queues_to_recv_weather(instance_id)
         self.__initialize_queues_to_recv_and_send_trips()
         self._days_that_rained_in_city = set()
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
@@ -45,6 +46,8 @@ class WeatherProcessor:
     def __recv_weather_data(self):
         self._weather_recv_communication_handler.start_consuming()
         self._channel1.close()
+        logging.info(f"{len(self._days_that_rained_in_city)}, "
+                     f"{('washington', datetime.date(2013, 6, 9)) in self._days_that_rained_in_city}")
         logging.info(f"Finished receiving weather data")
 
     def __process_trip_data(self, _ch, _method, _properties, body):
@@ -69,12 +72,13 @@ class WeatherProcessor:
         if len(rainy_trips_duration_batch) > 0:
             self._result_sender_communication_handler.send_rainy_trip_duration_batch(rainy_trips_duration_batch)
 
-    def __initialize_queues_to_recv_weather(self):
-        weather_queue = RabbProdConsQueue(self._channel1, "WeatherData", self.__process_weather_data)
+    def __initialize_queues_to_recv_weather(self, _instance_id):
+        weather_queue = RabbPublSubsQueue(self._channel1, "WeatherData", self.__process_weather_data)
+        #weather_queue = RabbProdConsQueue(self._channel1, "WeatherData", self.__process_weather_data)
         self._weather_recv_communication_handler = QueueCommunicationHandler(weather_queue)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        trips_queue = RabbPublSubsQueue(self._channel2, "TripData", self.__process_trip_data)
+        trips_queue = RabbProdConsQueue(self._channel2, "TripDataQuery1", self.__process_trip_data)
         self._trips_recv_communication_handler = QueueCommunicationHandler(trips_queue)
         result_queue = RabbProdConsQueue(self._channel2, "ResultData")
         self._result_sender_communication_handler = QueueCommunicationHandler(result_queue)

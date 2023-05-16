@@ -28,8 +28,7 @@ def initialize_config():
 
     config_params = {}
     try:
-        pass
-        #config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
+        config_params["instance_id"] = os.getenv('INSTANCE_ID', config["DEFAULT"]["INSTANCE_ID"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
     except ValueError as e:
@@ -59,7 +58,7 @@ def main():
     channel2 = rabbit_initializer.get_channel()
 
     try:
-        process = WeatherProcessor(channel1, channel2)
+        process = WeatherProcessor(config_params["instance_id"], channel1, channel2)
         process.run()
     except Exception as _e:
         logging.info(traceback.format_exc())
