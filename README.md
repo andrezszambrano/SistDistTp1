@@ -1,3 +1,7 @@
+[Documentation 4+1](https://docs.google.com/document/d/1XDQToCCFDg2lCdNnH7EYLO4A9ozPr4JifoqsJPjl-80/edit?usp=sharing) 
+
+---------------------------------------------------------------
+
 To run the application, clone this repository and download the [kaggle's data](https://www.kaggle.com/datasets/jeanmidev/public-bike-sharing-in-north-america) .zip, extract it
 to a folder named data (son of the root folder).
 Now, execute on the root folder:
