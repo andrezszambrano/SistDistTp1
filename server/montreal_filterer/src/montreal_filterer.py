@@ -82,5 +82,5 @@ class MontrealFilterer:
     def __initialize_queues_to_recv_and_send_trips(self):
         trip_queue = RabbProdConsQueue(self._channel2, "TripDataQuery3", self.__filter_trip_data)
         self._trips_recv_communication_handler = QueueCommunicationHandler(trip_queue)
-        filtered_trips_queue = RabbPublSubsQueue(self._channel2, "MontrealTrips")
+        filtered_trips_queue = RabbProdConsQueue(self._channel2, "MontrealTrips")
         self._trips_sender_communication_handler = QueueCommunicationHandler(filtered_trips_queue)

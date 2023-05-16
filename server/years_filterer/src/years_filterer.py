@@ -83,5 +83,5 @@ class YearsFilterer:
     def __initialize_queues_to_recv_and_send_trips(self):
         trip_queue = RabbProdConsQueue(self._channel2, "TripDataQuery2", self.__filter_trip_data)
         self._trips_recv_communication_handler = QueueCommunicationHandler(trip_queue)
-        filtered_trips_queue = RabbPublSubsQueue(self._channel2, "2016-17Trips")
+        filtered_trips_queue = RabbProdConsQueue(self._channel2, "2016-17Trips")
         self._trips_sender_communication_handler = QueueCommunicationHandler(filtered_trips_queue)

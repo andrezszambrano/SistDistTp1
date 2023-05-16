@@ -73,7 +73,7 @@ class DuplicatedStationsProcessor:
         self._station_recv_communication_handler = QueueCommunicationHandler(station_queue)
 
     def __initialize_queues_to_recv_and_send_trips(self):
-        trips_queue = RabbPublSubsQueue(self._channel2, "2016-17Trips", self.__process_trip_data)
+        trips_queue = RabbProdConsQueue(self._channel2, "2016-17Trips", self.__process_trip_data)
         self._trips_recv_communication_handler = QueueCommunicationHandler(trips_queue)
         self._result_queue = RabbProdConsQueue(self._channel2, "ResultData")
         self._result_sender_communication_handler = QueueCommunicationHandler(self._result_queue)
