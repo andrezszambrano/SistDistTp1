@@ -1,4 +1,10 @@
-services:
+import sys
+
+number_of_clients = int(sys.argv[1])
+
+f = open("docker-compose-dev.yaml", "w")
+
+f.write('''services:
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:latest
@@ -236,7 +242,9 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - INSTANCE_ID=2
+''')
 
+f.write('''
 volumes:
   server-config:
     external: false
@@ -252,4 +260,7 @@ networks:
       driver: default
       config:
         - subnet: 172.25.125.0/24
+''')
+f.write("\n")
 
+f.close()
