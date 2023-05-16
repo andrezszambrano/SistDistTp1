@@ -1,4 +1,5 @@
 import logging
+import signal
 
 from .mutable_boolean import MutableBoolean
 from .packet import Packet
@@ -15,24 +16,37 @@ class DataDistributor:
 
     def __init__(self, channel):
         self._channel = channel
-        self._data_queue = RabbProdConsQueue(channel, "AllData", self.__process_data)
-        self._weather_queue = RabbProdConsQueue(channel, "WeatherData")
-        self._station_queue = RabbPublSubsQueue(channel, "StationData")
-        self._trips_queue = RabbPublSubsQueue(channel, "TripData")
+        data_queue = RabbProdConsQueue(channel, "AllData", self.__process_data)
+        weather_queue = RabbProdConsQueue(channel, "WeatherData")
+        station_queue = RabbPublSubsQueue(channel, "StationData")
+        trips_queue = RabbPublSubsQueue(channel, "TripData")
         self._finished_bool = MutableBoolean(False)
+        self._server_communication_handler = QueueCommunicationHandler(data_queue)
+        self._weather_communication_handler = QueueCommunicationHandler(weather_queue)
+        self._stations_communication_handler = QueueCommunicationHandler(station_queue)
+        self._trips_communication_handler = QueueCommunicationHandler(trips_queue)
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
+
+    def __exit_gracefully(self, _signum, _frame):
+        logging.info("Exiting gracefully")
+        self.__close_resources()
 
     def __process_data(self, _ch, _method, _properties, body):
-        server_communication_handler = QueueCommunicationHandler(self._data_queue)
-        weather_communication_handler = QueueCommunicationHandler(self._weather_queue)
-        stations_communication_handler = QueueCommunicationHandler(self._station_queue)
-        trips_communication_handler = QueueCommunicationHandler(self._trips_queue)
-        action = server_communication_handler.recv_data_distributer_action(Packet(body))
-        action.perform_action_(self._finished_bool, weather_communication_handler, stations_communication_handler,
-                               trips_communication_handler)
+        action = self._server_communication_handler.recv_data_distributer_action(Packet(body))
+        action.perform_action_(self._finished_bool, self._weather_communication_handler,
+                               self._stations_communication_handler, self._trips_communication_handler)
         if self._finished_bool.get_boolean():
             self._channel.stop_consuming()
             return
 
     def run(self):
-        self._data_queue.start_recv_loop()
+        self._server_communication_handler.start_consuming()
+        self.__close_resources()
+
+    def __close_resources(self):
+        self._server_communication_handler.close()
+        self._weather_communication_handler.close()
+        self._stations_communication_handler.close()
+        self._trips_communication_handler.close()
+        self._channel.stop_consuming()
         self._channel.close()
