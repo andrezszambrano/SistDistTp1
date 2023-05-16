@@ -35,5 +35,9 @@ make docker-compose-stop
 
 On the first terminal, all processes should exit with 0 code. Same goes when the application ends successfully.
 
+Note: Client's QueryAsker periodically sleeps to ask the server for the current query results. When sigterm signal is received, if the process is sleeping it continues and then finishes gracefully. That is the main reason why the client may take a bit longer to shutdown gracefully.  
 
-Note: when the an accepting node (client_main_api or query_processor) is accepting the connection and it receives a sigterm, I could not handle the exception in a good fashion so those nodes do not end gracefully.
+To improve (due to lack of time):
+* When the an accepting node (client_main_api or query_processor) is accepting the connection and it receives a sigterm, I could not handle the exception in a good fashion so those nodes do not end gracefully.
+* To wait for rabbit sleeps are used. Client sleeps to wait to start a connection with Rabbit.
+* Sequence diagram is missing.
