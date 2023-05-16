@@ -1,6 +1,6 @@
 import sys
 
-number_of_clients = int(sys.argv[1])
+number_of_replicates = int(sys.argv[1])
 
 f = open("docker-compose-dev.yaml", "w")
 
@@ -92,157 +92,85 @@ f.write('''services:
       - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
-
-  weather_processor:
-    container_name: weather_processor
-    image: weather_processor_image:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
-
-  weather_processor2:
-    container_name: weather_processor2
-    image: weather_processor_image:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=2
-
-  years_filterer:
-    container_name: years_filterer
-    image: years_filterer:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
-
-  years_filterer2:
-    container_name: years_filterer2
-    image: years_filterer:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=2
-
-  duplicated_processor:
-    container_name: duplicated_processor
-    image: duplicated_processor:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
-
-  duplicated_processor2:
-    container_name: duplicated_processor2
-    image: duplicated_processor:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=2
-
-  montreal_filterer:
-    container_name: montreal_filterer
-    image: montreal_filterer:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
-
-  montreal_filterer2:
-    container_name: montreal_filterer2
-    image: montreal_filterer:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=2
-
-  montreal_distance_processor:
-    container_name: montreal_distance_processor
-    image: montreal_distance_processor:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
-
-  montreal_distance_processor2:
-    container_name: montreal_distance_processor2
-    image: montreal_distance_processor:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=2
 ''')
+
+for i in range(1, 1 + number_of_replicates):
+    f.write(f'''
+  weather_processor{i}:
+    container_name: weather_processor{i}
+    image: weather_processor_image:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID={i}
+
+  years_filterer{i}:
+    container_name: years_filterer{i}
+    image: years_filterer:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID={i}
+
+  duplicated_processor{i}:
+    container_name: duplicated_processor{i}
+    image: duplicated_processor:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID={i}
+
+  montreal_filterer{i}:
+    container_name: montreal_filterer{i}
+    image: montreal_filterer:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID={i}
+
+  montreal_distance_processor{i}:
+    container_name: montreal_distance_processor{i}
+    image: montreal_distance_processor:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID={i}
+    ''')
 
 f.write('''
 volumes:

@@ -87,8 +87,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
-  weather_processor:
-    container_name: weather_processor
+  weather_processor1:
+    container_name: weather_processor1
     image: weather_processor_image:latest
     entrypoint: python3 /main.py
     #restart: on-failure
@@ -102,6 +102,66 @@ services:
       - PYTHONUNBUFFERED=1
       - INSTANCE_ID=1
 
+  years_filterer1:
+    container_name: years_filterer1
+    image: years_filterer:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID=1
+
+  duplicated_processor1:
+    container_name: duplicated_processor1
+    image: duplicated_processor:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID=1
+
+  montreal_filterer1:
+    container_name: montreal_filterer1
+    image: montreal_filterer:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID=1
+
+  montreal_distance_processor1:
+    container_name: montreal_distance_processor1
+    image: montreal_distance_processor:latest
+    entrypoint: python3 /main.py
+    #restart: on-failure
+    depends_on:
+      - rabbitmq
+    networks:
+      - testing_net
+    links:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      - INSTANCE_ID=1
+    
   weather_processor2:
     container_name: weather_processor2
     image: weather_processor_image:latest
@@ -116,21 +176,6 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - INSTANCE_ID=2
-
-  years_filterer:
-    container_name: years_filterer
-    image: years_filterer:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
 
   years_filterer2:
     container_name: years_filterer2
@@ -147,21 +192,6 @@ services:
       - PYTHONUNBUFFERED=1
       - INSTANCE_ID=2
 
-  duplicated_processor:
-    container_name: duplicated_processor
-    image: duplicated_processor:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
-
   duplicated_processor2:
     container_name: duplicated_processor2
     image: duplicated_processor:latest
@@ -176,21 +206,6 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - INSTANCE_ID=2
-
-  montreal_filterer:
-    container_name: montreal_filterer
-    image: montreal_filterer:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
 
   montreal_filterer2:
     container_name: montreal_filterer2
@@ -207,21 +222,6 @@ services:
       - PYTHONUNBUFFERED=1
       - INSTANCE_ID=2
 
-  montreal_distance_processor:
-    container_name: montreal_distance_processor
-    image: montreal_distance_processor:latest
-    entrypoint: python3 /main.py
-    #restart: on-failure
-    depends_on:
-      - rabbitmq
-    networks:
-      - testing_net
-    links:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      - INSTANCE_ID=1
-
   montreal_distance_processor2:
     container_name: montreal_distance_processor2
     image: montreal_distance_processor:latest
@@ -236,7 +236,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - INSTANCE_ID=2
-
+    
 volumes:
   server-config:
     external: false
