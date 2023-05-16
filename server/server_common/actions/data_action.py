@@ -15,7 +15,7 @@ class DataAction(Action):
         #logging.debug(f"{self._data_type}: {self._data.info()}")
         distributor_communicator_handler.send_data_to_distributer(self._data_type, self._data)
 
-    def perform_action_(self, _finished_bool, weather_communication_handler, stations_communication_handler,
+    def perform_action_(self, _finished_bool, _processes_per_layer, weather_communication_handler, stations_communication_handler,
                         trips_communication_handler):
         #logging.debug(f"{self}: {self._data_type}")
         if self._data_type == Protocol().WEATHER_DATA:

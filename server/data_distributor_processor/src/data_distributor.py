@@ -11,8 +11,9 @@ from .rabb_list_prod_cons_queue import RabbListProdConsQueue
 
 class DataDistributor:
 
-    def __init__(self, channel):
+    def __init__(self, processes_per_layer, channel):
         self._channel = channel
+        self._processes_per_layer = processes_per_layer
         data_queue = RabbProdConsQueue(channel, "AllData", self.__process_data)
         weather_queue = RabbPublSubsQueue(channel, "WeatherData")
         station_queue = RabbPublSubsQueue(channel, "StationData")
@@ -30,7 +31,7 @@ class DataDistributor:
 
     def __process_data(self, _ch, _method, _properties, body):
         action = self._server_communication_handler.recv_data_distributer_action(Packet(body))
-        action.perform_action_(self._finished_bool, self._weather_communication_handler,
+        action.perform_action_(self._finished_bool, self._processes_per_layer, self._weather_communication_handler,
                                self._stations_communication_handler, self._trips_communication_handler)
         if self._finished_bool.get_boolean():
             self._channel.stop_consuming()

@@ -11,18 +11,18 @@ class FinishedAction(Action):
         finished_bool.set(True)
         distributor_communicator_handler.send_finished()
 
-    def perform_action_(self, finished_bool, weather_communication_handler, stations_communication_handler,
+    def perform_action_(self, finished_bool, processes_per_layer, weather_communication_handler, stations_communication_handler,
                         trips_communication_handler):
         finished_bool.set(True)
         weather_communication_handler.send_finished()
         stations_communication_handler.send_finished()
-        for _i in range(2-1): #Amount of filterers - 1
+        for _i in range(processes_per_layer - 1): #Amount of filterers - 1
             trips_communication_handler.send_finished()
         trips_communication_handler.send_last_finished()
 
     def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler, printing_counter):
-        counter.increase()
-        if counter.get() == 6:
+        finished = counter.increase()
+        if finished:
             query_results.set_final_data()
             query_action = QueryAskAction()
             query_action.perform_action__(finished_bool, counter, query_results, _query_communication_handler, printing_counter)

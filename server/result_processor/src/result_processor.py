@@ -11,13 +11,16 @@ from .counter import Counter
 
 
 class ResultMonitorProcessor:
-    def __init__(self, channel):
+    QUERIES = 3
+
+    def __init__(self, processes_per_layer, channel):
         self._channel = channel
         results_queue = RabbProdConsQueue(channel, "ResultData", self.__process_result_data)
         self._results_recv_communication_handler = QueueCommunicationHandler(results_queue)
         self._communication_handler = QueueCommunicationHandler(None)
         self._printing_counter = PrintingCounter("Registered in result", 10000)
-        self._counter = Counter()
+        logging.info(f"{processes_per_layer}")
+        self._counter = Counter(self.QUERIES * processes_per_layer)
         query_queue = RabbProdConsQueue(channel, "QueryData")
         self._query_communication_handler = QueueCommunicationHandler(query_queue)
         self._query_results = QueryData({}, {2016: {}, 2017: {}}, {}, False)

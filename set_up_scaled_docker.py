@@ -192,3 +192,9 @@ networks:
 f.write("\n")
 
 f.close()
+
+c = open("./server/server_common/config.ini", "w")
+c.write(f'''[DEFAULT]
+PROCESSES_PER_LAYER = {number_of_replicates}
+''')
+c.close()

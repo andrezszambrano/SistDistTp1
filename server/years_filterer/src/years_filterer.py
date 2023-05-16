@@ -8,10 +8,11 @@ from .rabb_prod_cons_queue import RabbProdConsQueue
 
 
 class YearsFilterer:
-    def __init__(self, instance_id, channel1, channel2):
+    def __init__(self, instance_id, processes_per_layer, channel1, channel2):
         self._channel1 = channel1
         self._channel2 = channel2
         self._instance_id = instance_id
+        self._processes_per_layer = processes_per_layer
         self._communication_receiver = QueueCommunicationHandler(None)
         self.__initialize_queues_to_recv_stations()
         self.__initialize_queues_to_recv_and_send_trips()
@@ -59,7 +60,7 @@ class YearsFilterer:
     def __recv_and_filter_trips_data(self):
         self._trips_recv_communication_handler.start_consuming()
         if self._last_finished:
-            for _i in range(2): #number of processing duplicates
+            for _i in range(self._processes_per_layer):
                 self._trips_sender_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data. Last finished: {self._last_finished}")
