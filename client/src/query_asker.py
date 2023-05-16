@@ -25,11 +25,12 @@ class QueryAsker:
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
         socket = self._connect()
         communication_handler = ClientCommunicationHandler(socket)
+        time.sleep(self.WAIT)
         while not self._finished_bool.get_boolean():
-            time.sleep(self.WAIT)
             query_result = communication_handler.get_query_results()
             query_result.print()
             self._finished_bool.set(query_result.final_result or self._finished_bool.get_boolean())
+            time.sleep(self.WAIT)
         socket.shutdown_and_close()
 
     def _connect(self):
