@@ -16,11 +16,12 @@ class FinishedAction(Action):
         finished_bool.set(True)
         weather_communication_handler.send_finished()
         stations_communication_handler.send_finished()
-        trips_communication_handler.send_finished()
+        for _i in range(2):
+            trips_communication_handler.send_finished()
 
     def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler, printing_counter):
         counter.increase()
-        if counter.get() == 3:
+        if counter.get() == 6:
             query_results.set_final_data()
             query_action = QueryAskAction()
             query_action.perform_action__(finished_bool, counter, query_results, _query_communication_handler, printing_counter)

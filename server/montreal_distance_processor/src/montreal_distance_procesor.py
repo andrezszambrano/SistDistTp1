@@ -11,7 +11,7 @@ from .rabb_publ_subs_queue import RabbPublSubsQueue
 
 
 class MontrealDistanceProcessor:
-    def __init__(self, channel1, channel2):
+    def __init__(self, _instance_id, channel1, channel2):
         self._channel1 = channel1
         self._channel2 = channel2
         self._communication_receiver = QueueCommunicationHandler(None)

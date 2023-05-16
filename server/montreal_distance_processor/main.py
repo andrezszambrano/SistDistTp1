@@ -29,7 +29,7 @@ def initialize_config():
 
     config_params = {}
     try:
-        pass
+        config_params["instance_id"] = os.getenv('INSTANCE_ID', config["DEFAULT"]["INSTANCE_ID"])
         #config_params["logging_level"] = os.getenv('LOGGING_LEVEL', config["DEFAULT"]["LOGGING_LEVEL"])
     except KeyError as e:
         raise KeyError("Key was not found. Error: {} .Aborting server".format(e))
@@ -60,7 +60,7 @@ def main():
     channel2 = rabbit_initializer.get_channel()
 
     try:
-        process = MontrealDistanceProcessor(channel1, channel2)
+        process = MontrealDistanceProcessor(config_params["instance_id"], channel1, channel2)
         process.run()
     except Exception as _e:
         logging.info(traceback.format_exc())

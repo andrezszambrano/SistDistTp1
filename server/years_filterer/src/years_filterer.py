@@ -8,9 +8,10 @@ from .rabb_prod_cons_queue import RabbProdConsQueue
 
 
 class YearsFilterer:
-    def __init__(self, channel1, channel2):
+    def __init__(self, instance_id, channel1, channel2):
         self._channel1 = channel1
         self._channel2 = channel2
+        self._instance_id = instance_id
         self._communication_receiver = QueueCommunicationHandler(None)
         self.__initialize_queues_to_recv_stations()
         self.__initialize_queues_to_recv_and_send_trips()
@@ -56,7 +57,9 @@ class YearsFilterer:
 
     def __recv_and_filter_trips_data(self):
         self._trips_recv_communication_handler.start_consuming()
-        self._trips_sender_communication_handler.send_finished()
+        if self._instance_id == "1":
+            for _i in range(2):
+                self._trips_sender_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data")
 

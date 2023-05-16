@@ -10,10 +10,6 @@ from .rabb_list_prod_cons_queue import RabbListProdConsQueue
 
 
 class DataDistributor:
-    AMOUNT_OF_STATIONS_SUBS = 2
-    AMOUNT_OF_TRIP_SUBS = 3
-    DUPLICATED_STATIONS_QUEUE_ID = 0
-    MONTREAL_QUEUE_ID = 1
 
     def __init__(self, channel):
         self._channel = channel
