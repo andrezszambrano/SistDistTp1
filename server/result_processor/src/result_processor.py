@@ -42,4 +42,3 @@ class ResultMonitorProcessor:
         self._results_recv_communication_handler.start_consuming()
         self._channel.close()
         logging.info(f"Finished receiving results data")
-

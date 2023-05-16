@@ -1,4 +1,5 @@
 import logging
+import signal
 
 from .packet import Packet
 from .query_result import QueryResult
@@ -13,14 +14,24 @@ class QueryProcessor:
         self._channel = channel
         ask_results_queue = RabbProdConsQueue(channel, "ResultData")
         self._ask_results_communication_handler = QueueCommunicationHandler(ask_results_queue)
-        self._query_result_queue = RabbProdConsQueue(channel, "QueryData", self.__process_query_data)
-        self._query_result_communication_handler = QueueCommunicationHandler(None)
+        query_result_queue = RabbProdConsQueue(channel, "QueryData", self.__process_query_data)
+        self._query_result_recv_communication_handler = QueueCommunicationHandler(query_result_queue)
+        self._communication_handler = QueueCommunicationHandler(None)
         acceptor_socket = AcceptorSocket('', port, 5)
         socket = acceptor_socket.accept()
         self._client_communicator_handler = SocketCommunicationHandler(socket)
+        signal.signal(signal.SIGTERM, self.__exit_gracefully)
+
+    def __exit_gracefully(self, _signum, _frame):
+        logging.info("Exiting gracefully")
+        self._ask_results_communication_handler.close()
+        self._query_result_recv_communication_handler.close()
+        self._client_communicator_handler.close()
+        self._channel.stop_consuming()
+        self._channel.close()
 
     def __process_query_data(self, _ch, _method, _properties, body):
-        query_data = self._query_result_communication_handler.recv_query_data(Packet(body))
+        query_data = self._communication_handler.recv_query_data(Packet(body))
         query_result = self.__transform_query_data_in_result(query_data)
         self._client_communicator_handler.send_query_results(query_result)
         if query_result.final_result:
@@ -32,8 +43,9 @@ class QueryProcessor:
     def run(self):
         self._client_communicator_handler.recv_query_ask()
         self._ask_results_communication_handler.send_query_ask()
-        self._query_result_queue.start_recv_loop()
+        self._query_result_recv_communication_handler.start_consuming()
         self._channel.close()
+        self._client_communicator_handler.close()
 
     def __transform_query_data_in_result(self, query_data):
         rainy_date_n_avg_list = self.__parse_date_to_duration_avg_dict_to_list(query_data.date_to_duration_avg)

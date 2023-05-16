@@ -18,13 +18,16 @@ class Socket(ByteStream, PacketSender):
             _socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             _socket.connect((host, port))
         self._socket = _socket
+        self._closed = False
 
     def getpeername(self):
         return self._socket.getpeername()
 
     def shutdown_and_close(self):
-        self._socket.shutdown(socket.SHUT_RDWR)
-        self._socket.close()
+        if not self._closed:
+            self._socket.shutdown(socket.SHUT_RDWR)
+            self._socket.close()
+            self._closed = True
 
     def __send(self, buffer, length):
         sent = 0
@@ -33,6 +36,8 @@ class Socket(ByteStream, PacketSender):
             sent = sent + aux
 
     def read(self, length):
+        if self._closed:
+            return
         received_data = b""
         while len(received_data) < length:
             data_chunk = self._socket.recv(length - len(received_data))
@@ -40,6 +45,8 @@ class Socket(ByteStream, PacketSender):
         return received_data
 
     def send(self, packet):
+        if self._closed:
+            return
         bytes = packet.get_bytes()
         offset = 0
         while offset < len(bytes):

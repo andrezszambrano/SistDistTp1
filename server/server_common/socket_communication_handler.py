@@ -28,3 +28,6 @@ class SocketCommunicationHandler:
     def recv_query_ask(self):
         protocol = ServerProtocol()
         return protocol.recv_query_ask(self._socket)
+
+    def close(self):
+        self._socket.shutdown_and_close()
