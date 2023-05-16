@@ -16,6 +16,11 @@ class QueueCommunicationHandler:
         self._server_protocol.add_finished_to_packet(packet)
         self._queue.send(packet)
 
+    def send_last_finished(self):
+        packet = Packet()
+        self._server_protocol.add_last_finished_to_packet(packet)
+        self._queue.send(packet)
+
     def send_station_finished(self):
         packet = Packet()
         self._server_protocol.add_station_finished_to_packet(packet)

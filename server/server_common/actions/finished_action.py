@@ -16,8 +16,9 @@ class FinishedAction(Action):
         finished_bool.set(True)
         weather_communication_handler.send_finished()
         stations_communication_handler.send_finished()
-        for _i in range(2):
+        for _i in range(2-1): #Amount of filterers - 1
             trips_communication_handler.send_finished()
+        trips_communication_handler.send_last_finished()
 
     def perform_action__(self, finished_bool, counter, query_results, _query_communication_handler, printing_counter):
         counter.increase()

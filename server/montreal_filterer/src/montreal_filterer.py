@@ -15,6 +15,7 @@ class MontrealFilterer:
         self.__initialize_queues_to_recv_stations()
         self.__initialize_queues_to_recv_and_send_trips()
         self._communication_receiver = QueueCommunicationHandler(None)
+        self._last_finished = False
         signal.signal(signal.SIGTERM, self.__exit_gracefully)
 
     def __exit_gracefully(self, _signum, _frame):
@@ -57,17 +58,19 @@ class MontrealFilterer:
 
     def __recv_and_filter_trips_data(self):
         self._trips_recv_communication_handler.start_consuming()
-        logging.info(f"{self._instance_id}")
-        if self._instance_id == "1":
-            for _i in range(2):
+        if self._last_finished:
+            for _i in range(2): #number of processing duplicates
                 self._trips_sender_communication_handler.send_finished()
         self._channel2.close()
         logging.info(f"Finished receiving trips data")
 
     def __filter_trip_data(self, _ch, _method, _properties, body):
         trip_batch = self._communication_receiver.recv_trip_batch(Packet(body))
-        if trip_batch is None:
+        if type(trip_batch) is bool:
+            last_finished = trip_batch
             self._channel2.stop_consuming()
+            if last_finished:
+                self._last_finished = True
             return
         filtered_trips = []
         for trip in trip_batch:

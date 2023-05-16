@@ -50,7 +50,7 @@ class MontrealDistanceProcessor:
 
     def __process_trip_data(self, _ch, _method, _properties, body):
         trip_batch = self._communication_receiver.recv_trip_batch(Packet(body))
-        if trip_batch is None:
+        if type(trip_batch) is bool:
             self._channel2.stop_consuming()
             return
         self._filter_trip_batch(trip_batch)

@@ -14,6 +14,7 @@ from .average import Average
 
 
 class ServerProtocol(Protocol):
+    LAST_FINISHED = "L"
 
     def __init__(self):
         super(ServerProtocol, self).__init__()
@@ -186,8 +187,8 @@ class ServerProtocol(Protocol):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().WEATHER_FINISHED:
             return None
-        we = self.__recv_weather_batch(byte_stream)
-        return we
+        weather_batch = self.__recv_weather_batch(byte_stream)
+        return weather_batch
 
     def recv_station_batch_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
@@ -198,7 +199,9 @@ class ServerProtocol(Protocol):
     def recv_trip_batch_or_finished(self, byte_stream):
         message_type = super()._recv_byte(byte_stream)
         if message_type == super().FINISHED:
-            return None
+            return False
+        elif message_type == self.LAST_FINISHED:
+            return True
         return self.__recv_trip_batch(byte_stream)
 
     def recv_query_ask(self, byte_stream):
@@ -279,3 +282,6 @@ class ServerProtocol(Protocol):
 
     def add_station_finished_to_packet(self, packet):
         packet.add_byte(super().STATION_FINISHED)
+
+    def add_last_finished_to_packet(self, packet):
+        packet.add_byte(self.LAST_FINISHED)
