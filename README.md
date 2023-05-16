@@ -1,4 +1,4 @@
-[Documentation 4+1](https://docs.google.com/document/d/1XDQToCCFDg2lCdNnH7EYLO4A9ozPr4JifoqsJPjl-80/edit?usp=sharing) 
+Please refer to the 4+1 pdf document that is in the repository to read about the system's architecture.
 
 ---------------------------------------------------------------
 
